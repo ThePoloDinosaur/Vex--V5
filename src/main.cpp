@@ -1,4 +1,4 @@
-#include "main.h"
+#include "main.h" // This is the main header file for PROS, which includes all necessary libraries and definitions for the robot's operation.
 #include "lemlib/api.hpp"
 #include "pros/adi.hpp"
 #include "pros/imu.hpp"
