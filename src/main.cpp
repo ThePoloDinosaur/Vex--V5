@@ -9,7 +9,7 @@
 #include "pros/screen.hpp"
 #include "autons.hpp"
 #include <algorithm> // No idea what this does, but it was in the original code. I think it has something to do with the clamp function.
-
+#include <cstring>
 
 // ============================================================
 // ROBOT HARDWARE
@@ -19,28 +19,22 @@
 // -------------------- DRIVETRAIN ----------------------------
 
 
-pros::MotorGroup left_motors(
-	{-1, 2, 3},
-	pros::MotorGearset::blue
-);
+pros::MotorGroup left_motors({-1, 2, 3}, pros::MotorGearset::blue);
 
 
-pros::MotorGroup right_motors(
-	{11, -12, -13},
-	pros::MotorGearset::blue
-);
+pros::MotorGroup right_motors({11, -12, -13}, pros::MotorGearset::blue);
 
 
 // -------------------- LIFT ----------------------------------
 
 
-pros::MotorGroup lift_motors({-9, 14},pros::MotorGearset::green);
+pros::MotorGroup lift_motors({-9, 14}, pros::MotorGearset::green);
 
 
 // -------------------- PNEUMATIC -----------------------------
 
 
-pros::adi::Pneumatics piston('H',true);
+pros::adi::Pneumatics piston('H', true);
 
 
 // -------------------- IMU -----------------------------------
@@ -55,17 +49,14 @@ pros::Rotation vertical_encoder(4);
 
 lemlib::TrackingWheel vertical_tracking_wheel(
 	&vertical_encoder,
-	lemlib::Omniwheel::NEW_2,
-	0
+	lemlib::Omniwheel::NEW_2,0
 );
 
 
 // -------------------- CONTROLLER ----------------------------
 
 
-pros::Controller controller(
-	pros::E_CONTROLLER_MASTER
-);
+pros::Controller controller(pros::E_CONTROLLER_MASTER);
 
 
 // ============================================================
@@ -271,39 +262,25 @@ struct Button {
 // ============================================================
 
 
-const Button driverwall_button = {
-	20, 65, 225, 167
-};
+const Button driverwall_button = {20, 65, 225, 167};
 
 
-const Button sidewall_button = {
-	255, 65, 460, 167
-};
+const Button sidewall_button = {255, 65, 460, 167};
 
 
-const Button skills_button = {
-	20, 176, 225, 216
-};
+const Button skills_button = {20, 176, 225, 216};
 
 
-const Button pid_tuning_button = {
-	255, 176, 460, 216
-};
+const Button pid_tuning_button = {255, 176, 460, 216};
 
 
-const Button back_button = {
-	8, 8, 88, 42
-};
+const Button back_button = {8, 8, 88, 42};
 
 
-const Button lateral_button = {
-	20, 65, 225, 167
-};
+const Button lateral_button = {20, 65, 225, 167};
 
 
-const Button angular_button = {
-	255, 65, 460, 167
-};
+const Button angular_button = {255, 65, 460, 167};
 
 
 // ============================================================
@@ -311,35 +288,31 @@ const Button angular_button = {
 // ============================================================
 
 
-void draw_button(
-	const Button& button,
-	int fill_color,
-	int border_color
-) {
+void draw_button(const Button& button, int fill_color, int border_color) {
 
 
 	// Fill
 	pros::screen::set_pen(fill_color);
 
 
-	pros::screen::fill_rect(
-		button.x1,
-		button.y1,
-		button.x2,
-		button.y2
-	);
+	pros::screen::fill_rect(button.x1, button.y1, button.x2, button.y2);
 
 
 	// Border
 	pros::screen::set_pen(border_color);
 
 
-	pros::screen::draw_rect(
-		button.x1,
-		button.y1,
-		button.x2,
-		button.y2
-	);
+	pros::screen::draw_rect(button.x1, button.y1, button.x2, button.y2);
+}
+
+
+void print_centered(pros::text_format_e_t format, int char_width, int center_x, int y, const char* text) {
+
+
+	int text_width = std::strlen(text) * char_width;
+
+
+	pros::screen::print(format, center_x - text_width / 2, y, "%s", text);
 }
 
 
@@ -348,30 +321,19 @@ void draw_button(
 // ============================================================
 
 
-void draw_button_text(
-	const Button& button,
-	const char* text
-) {
+void draw_button_text(const Button& button, const char* text) {
 
 
-	int center_x =
-		(button.x1 + button.x2) / 2;
+	int center_x = (button.x1 + button.x2) / 2;
 
 
-	int center_y =
-		(button.y1 + button.y2) / 2;
+	int center_y = (button.y1 + button.y2) / 2;
 
 
 	pros::screen::set_pen(WHITE);
 
 
-	pros::screen::print(
-		pros::E_TEXT_MEDIUM_CENTER,
-		center_x,
-		center_y - 7,
-		"%s",
-		text
-	);
+	print_centered(pros::E_TEXT_MEDIUM, 10, center_x, center_y - 7, text);
 }
 
 
@@ -417,28 +379,16 @@ void draw_battery() {
 	pros::screen::set_pen(DARK_GRAY);
 
 
-	pros::screen::fill_rect(
-		405,
-		10,
-		479,
-		40
-	);
+	pros::screen::fill_rect(405, 10, 479, 40);
 
 
-	int battery =
-		pros::battery::get_capacity();
+	int battery = pros::battery::get_capacity();
 
 
 	pros::screen::set_pen(LIGHT_GRAY);
 
 
-	pros::screen::print(
-		pros::E_TEXT_SMALL,
-		420,
-		18,
-		"%d%%",
-		battery
-	);
+	pros::screen::print(pros::E_TEXT_SMALL, 420, 18, "%d%%", battery);
 }
 
 
@@ -448,24 +398,13 @@ void draw_selected_bar() {
 	pros::screen::set_pen(GRAY);
 
 
-	pros::screen::fill_rect(
-		15,
-		224,
-		465,
-		239
-	);
+	pros::screen::fill_rect(15, 224, 465, 239);
 
 
 	pros::screen::set_pen(WHITE);
 
 
-	pros::screen::print(
-		pros::E_TEXT_SMALL,
-		25,
-		229,
-		"SELECTED: %s",
-		get_auton_name()
-	);
+	pros::screen::print(pros::E_TEXT_SMALL, 25, 229, "SELECTED: %s", get_auton_name());
 }
 
 
@@ -480,12 +419,7 @@ void draw_auton_gui() {
 	pros::screen::set_pen(BLACK);
 
 
-	pros::screen::fill_rect(
-		0,
-		50,
-		SCREEN_WIDTH - 1,
-		SCREEN_HEIGHT - 1
-	);
+	pros::screen::fill_rect(0, 50, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1);
 
 
 	// --------------------------------------------------------
@@ -496,24 +430,14 @@ void draw_auton_gui() {
 	pros::screen::set_pen(DARK_GRAY);
 
 
-	pros::screen::fill_rect(
-		0,
-		0,
-		479,
-		49
-	);
+	pros::screen::fill_rect(0, 0, 479, 49);
 
 
 	// Header title
 	pros::screen::set_pen(WHITE);
 
 
-	pros::screen::print(
-		pros::E_TEXT_LARGE_CENTER,
-		240,
-		8,
-		"AUTON SELECTOR"
-	);
+	print_centered(pros::E_TEXT_LARGE, 20, 240, 8, "AUTON SELECTOR");
 
 
 	// --------------------------------------------------------
@@ -529,23 +453,10 @@ void draw_auton_gui() {
 	// --------------------------------------------------------
 
 
-	draw_button(
-		driverwall_button,
+	draw_button(driverwall_button, selected_auton == DRIVERWALL ? RED : RED_DARK, RED);
 
 
-		selected_auton == DRIVERWALL
-			? RED
-			: RED_DARK,
-
-
-		RED
-	);
-
-
-	draw_button_text(
-		driverwall_button,
-		"DRIVER WALL"
-	);
+	draw_button_text(driverwall_button, "DRIVER WALL");
 
 
 	// --------------------------------------------------------
@@ -553,23 +464,10 @@ void draw_auton_gui() {
 	// --------------------------------------------------------
 
 
-	draw_button(
-		sidewall_button,
+	draw_button(sidewall_button, selected_auton == SIDEWALL ? BLUE : BLUE_DARK, BLUE);
 
 
-		selected_auton == SIDEWALL
-			? BLUE
-			: BLUE_DARK,
-
-
-		BLUE
-	);
-
-
-	draw_button_text(
-		sidewall_button,
-		"SIDE WALL"
-	);
+	draw_button_text(sidewall_button, "SIDE WALL");
 
 
 	// --------------------------------------------------------
@@ -577,43 +475,16 @@ void draw_auton_gui() {
 	// --------------------------------------------------------
 
 
-	draw_button(
-		skills_button,
+	draw_button(skills_button, selected_auton == SKILLS ? GREEN : GREEN_DARK, GREEN);
 
 
-		selected_auton == SKILLS
-			? GREEN
-			: GREEN_DARK,
+	draw_button_text(skills_button, "SKILLS");
 
 
-		GREEN
-	);
+	draw_button(pid_tuning_button, selected_auton == PID_LATERAL || selected_auton == PID_ANGULAR ? LIGHT_GRAY : GRAY, LIGHT_GRAY);
 
 
-	draw_button_text(
-		skills_button,
-		"SKILLS"
-	);
-
-
-	draw_button(
-		pid_tuning_button,
-
-
-		selected_auton == PID_LATERAL ||
-		selected_auton == PID_ANGULAR
-			? LIGHT_GRAY
-			: GRAY,
-
-
-		LIGHT_GRAY
-	);
-
-
-	draw_button_text(
-		pid_tuning_button,
-		"PID TUNING"
-	);
+	draw_button_text(pid_tuning_button, "PID TUNING");
 
 
 	// --------------------------------------------------------
@@ -631,88 +502,40 @@ void draw_pid_gui() {
 	pros::screen::set_pen(BLACK);
 
 
-	pros::screen::fill_rect(
-		0,
-		50,
-		SCREEN_WIDTH - 1,
-		SCREEN_HEIGHT - 1
-	);
+	pros::screen::fill_rect(0, 50, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1);
 
 
 	pros::screen::set_pen(DARK_GRAY);
 
 
-	pros::screen::fill_rect(
-		0,
-		0,
-		479,
-		49
-	);
+	pros::screen::fill_rect(0, 0, 479, 49);
 
 
 	pros::screen::set_pen(WHITE);
 
 
-	pros::screen::print(
-		pros::E_TEXT_LARGE_CENTER,
-		240,
-		8,
-		"PID TUNING"
-	);
+	print_centered(pros::E_TEXT_LARGE, 20, 240, 8, "PID TUNING");
 
 
 	draw_battery();
 
 
-	draw_button(
-		back_button,
-		GRAY,
-		LIGHT_GRAY
-	);
+	draw_button(back_button, GRAY, LIGHT_GRAY);
 
 
-	draw_button_text(
-		back_button,
-		"< BACK"
-	);
+	draw_button_text(back_button, "< BACK");
 
 
-	draw_button(
-		lateral_button,
+	draw_button(lateral_button, selected_auton == PID_LATERAL ? LIGHT_GRAY : GRAY, LIGHT_GRAY);
 
 
-		selected_auton == PID_LATERAL
-			? LIGHT_GRAY
-			: GRAY,
+	draw_button_text(lateral_button, "LATERAL");
 
 
-		LIGHT_GRAY
-	);
+	draw_button(angular_button, selected_auton == PID_ANGULAR ? LIGHT_GRAY : GRAY, LIGHT_GRAY);
 
 
-	draw_button_text(
-		lateral_button,
-		"LATERAL"
-	);
-
-
-	draw_button(
-		angular_button,
-
-
-		selected_auton == PID_ANGULAR
-			? LIGHT_GRAY
-			: GRAY,
-
-
-		LIGHT_GRAY
-	);
-
-
-	draw_button_text(
-		angular_button,
-		"ANGULAR"
-	);
+	draw_button_text(angular_button, "ANGULAR");
 
 
 	draw_selected_bar();
@@ -724,19 +547,10 @@ void draw_pid_gui() {
 // ============================================================
 
 
-bool inside_button(
-	const Button& button,
-	int x,
-	int y
-) {
+bool inside_button(const Button& button, int x, int y) {
 
 
-	return (
-		x >= button.x1 &&
-		x <= button.x2 &&
-		y >= button.y1 &&
-		y <= button.y2
-	);
+	return x >= button.x1 && x <= button.x2 && y >= button.y1 && y <= button.y2;
 }
 
 
@@ -761,8 +575,7 @@ void auton_selector_task() {
 	while (true) {
 
 
-		pros::screen_touch_status_s_t touch =
-			pros::screen::touch_status();
+		pros::screen_touch_status_s_t touch = pros::screen::touch_status();
 
 
 		// ----------------------------------------------------
@@ -770,14 +583,10 @@ void auton_selector_task() {
 		// ----------------------------------------------------
 
 
-		if (
-			touch.touch_status == pros::E_TOUCH_PRESSED &&
-			touch.press_count != last_press_count
-		) {
+		if (touch.touch_status == pros::E_TOUCH_PRESSED && touch.press_count != last_press_count) {
 
 
-			last_press_count =
-				touch.press_count;
+			last_press_count = touch.press_count;
 
 
 			int x = touch.x;
@@ -787,13 +596,7 @@ void auton_selector_task() {
 			if (on_pid_screen) {
 
 
-				if (
-					inside_button(
-						back_button,
-						x,
-						y
-					)
-				) {
+				if (inside_button(back_button, x, y)) {
 
 
 					on_pid_screen = false;
@@ -803,13 +606,7 @@ void auton_selector_task() {
 				}
 
 
-				else if (
-					inside_button(
-						lateral_button,
-						x,
-						y
-					)
-				) {
+				else if (inside_button(lateral_button, x, y)) {
 
 
 					selected_auton = PID_LATERAL;
@@ -819,13 +616,7 @@ void auton_selector_task() {
 				}
 
 
-				else if (
-					inside_button(
-						angular_button,
-						x,
-						y
-					)
-				) {
+				else if (inside_button(angular_button, x, y)) {
 
 
 					selected_auton = PID_ANGULAR;
@@ -844,13 +635,7 @@ void auton_selector_task() {
 				// ------------------------------------------------
 
 
-				if (
-					inside_button(
-						driverwall_button,
-						x,
-						y
-					)
-				) {
+				if (inside_button(driverwall_button, x, y)) {
 
 
 					selected_auton = DRIVERWALL;
@@ -865,13 +650,7 @@ void auton_selector_task() {
 				// ------------------------------------------------
 
 
-				else if (
-					inside_button(
-						sidewall_button,
-						x,
-						y
-					)
-				) {
+				else if (inside_button(sidewall_button, x, y)) {
 
 
 					selected_auton = SIDEWALL;
@@ -886,13 +665,7 @@ void auton_selector_task() {
 				// ------------------------------------------------
 
 
-				else if (
-					inside_button(
-						skills_button,
-						x,
-						y
-					)
-				) {
+				else if (inside_button(skills_button, x, y)) {
 
 
 					selected_auton = SKILLS;
@@ -902,13 +675,7 @@ void auton_selector_task() {
 				}
 
 
-				else if (
-					inside_button(
-						pid_tuning_button,
-						x,
-						y
-					)
-				) {
+				else if (inside_button(pid_tuning_button, x, y)) {
 
 
 					on_pid_screen = true;
@@ -928,9 +695,7 @@ void auton_selector_task() {
 		battery_loops++;
 
 
-		if (
-			battery_loops >= 50
-		) {
+		if (battery_loops >= 50) {
 
 
 			battery_loops = 0;
@@ -969,9 +734,7 @@ void initialize() {
 	// --------------------------------------------------------
 
 
-	selector_task = new pros::Task(
-		auton_selector_task
-	);
+	selector_task = new pros::Task(auton_selector_task);
 
 
 
@@ -981,7 +744,7 @@ void initialize() {
 	//
 
 	//
-	//chassis.calibrate();
+	chassis.calibrate();
 }
 
 
@@ -1102,22 +865,14 @@ void opcontrol() {
 		// ====================================================
 
 
-		if (
-			controller.get_digital(
-				pros::E_CONTROLLER_DIGITAL_L2
-			)
-		) {
+		if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
 
 
 			lift_motors.move_velocity(200);
 		}
 
 
-		else if (
-			controller.get_digital(
-				pros::E_CONTROLLER_DIGITAL_L1
-			)
-		) {
+		else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
 			lift_motors.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
 			lift_motors.move_velocity(-200);
 		}
@@ -1136,22 +891,13 @@ void opcontrol() {
 		// ====================================================
 
 
-		int leftY =
-			controller.get_analog(
-				pros::E_CONTROLLER_ANALOG_LEFT_Y
-			);
+		int leftY = controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
 
 
-		int rightX =
-			controller.get_analog(
-				pros::E_CONTROLLER_ANALOG_RIGHT_X
-			);
+		int rightX = controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
 
 
-		chassis.arcade(
-			leftY,
-			rightX
-		);
+		chassis.arcade(leftY, rightX);
 
 
 		// ====================================================
@@ -1159,25 +905,18 @@ void opcontrol() {
 		// ====================================================
 
 
-		bool piston_pressed =
-			controller.get_digital(
-				pros::E_CONTROLLER_DIGITAL_B
-			);
+		bool piston_pressed = controller.get_digital(pros::E_CONTROLLER_DIGITAL_B);
 
 
 		// Toggle only on the initial button press
-		if (
-			piston_pressed &&
-			!piston_last
-		) {
+		if (piston_pressed && !piston_last) {
 
 
 			piston.toggle();
 		}
 
 
-		piston_last =
-			piston_pressed;
+		piston_last = piston_pressed;
 
 
 		// ====================================================
