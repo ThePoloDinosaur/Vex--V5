@@ -34,31 +34,23 @@ pros::MotorGroup right_motors(
 // -------------------- LIFT ----------------------------------
 
 
-pros::MotorGroup lift_motors(
-	{-9, 14},
-	pros::MotorGearset::green
-);
+pros::MotorGroup lift_motors({-9, 14},pros::MotorGearset::green);
 
 
 // -------------------- PNEUMATIC -----------------------------
 
 
-pros::adi::Pneumatics piston(
-	'H',
-	true
-);
+pros::adi::Pneumatics piston('H',true);
 
 
 // -------------------- IMU -----------------------------------
 
 
-pros::Imu imu(
-	4
-);
+pros::Imu imu(16);
 
 
 // ----------------------Tracking-Wheels-----------------------
-pros::Rotation vertical_encoder(5);
+pros::Rotation vertical_encoder(4);
 
 
 lemlib::TrackingWheel vertical_tracking_wheel(
@@ -93,7 +85,9 @@ pros::Controller controller(
 // kD = how strongly it reacts to rate of change
 //
 //
-//AqaZ
+//
+// Set kP = 2, kI = 0, kD = 5
+// Increase kP by 2 each time until it is fast and overshoots
 // Increase kD by 5 each time until it doesn't overshoot
 // Increase kI by 0.001 if it is barely undershooting
 //
@@ -750,7 +744,6 @@ bool inside_button(
 // AUTON SELECTOR TASK
 // ============================================================
 
-
 void auton_selector_task() {
 
 
@@ -758,6 +751,11 @@ void auton_selector_task() {
 
 
 	int battery_loops = 0;
+
+	pros::delay(100);
+
+
+	draw_auton_gui();
 
 
 	while (true) {
@@ -981,10 +979,9 @@ void initialize() {
 	// Initialize LemLib
 	// --------------------------------------------------------
 	//
-	// You have no IMU, so there is nothing to calibrate there.
-	// This still initializes the chassis/odometry system.
+
 	//
-	chassis.calibrate();
+	//chassis.calibrate();
 }
 
 
