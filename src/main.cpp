@@ -102,7 +102,7 @@ lemlib::ControllerSettings lateral_controller(
 	3,      // anti-windup
 	1,      // small error range (inches)
 	100,    // small error timeout (ms) <-- Adjusted from 10
-	3,      // large error range (inches) <-- Re-separated from small error
+	1,      // large error range (inches) <-- Re-separated from small error
 	500,    // large error timeout (ms) <-- Adjusted from 50
 	20      // maximum acceleration / slew
 );
