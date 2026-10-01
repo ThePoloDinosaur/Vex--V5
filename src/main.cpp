@@ -53,12 +53,12 @@ pros::adi::Pneumatics piston(
 
 
 pros::Imu imu(
-	4
+	16
 );
 
 
 // ----------------------Tracking-Wheels-----------------------
-pros::Rotation vertical_encoder(5);
+pros::Rotation vertical_encoder(4);
 
 
 lemlib::TrackingWheel vertical_tracking_wheel(
@@ -93,7 +93,9 @@ pros::Controller controller(
 // kD = how strongly it reacts to rate of change
 //
 //
-//AqaZ
+//
+// Set kP = 2, kI = 0, kD = 5
+// Increase kP by 2 each time until it is fast and overshoots
 // Increase kD by 5 each time until it doesn't overshoot
 // Increase kI by 0.001 if it is barely undershooting
 //
@@ -1081,6 +1083,7 @@ void autonomous() {
 
 
 			break;
+		*\
 	}
 
 }
