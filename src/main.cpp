@@ -98,7 +98,7 @@ pros::Controller controller(pros::E_CONTROLLER_MASTER);
 lemlib::ControllerSettings lateral_controller(
 	11,     // kP
 	0,      // kI
-	3,      // kD
+	10,      // kD
 	3,      // anti-windup
 	1,      // small error range (inches)
 	100,    // small error timeout (ms) <-- Adjusted from 10
@@ -157,7 +157,7 @@ lemlib::Drivetrain drivetrain(
 	12.35,                          // track width (inches)
 
 
-	lemlib::Omniwheel::NEW_275,    // 2.75" omni wheels
+	lemlib::Omniwheel::NEW_2,    // 2.75" omni wheels
 
 
 	450,                            // drivetrain RPM
@@ -459,6 +459,12 @@ void draw_auton_gui() {
 	// --------------------------------------------------------
 
 	draw_selected_bar();
+
+	// Print current position for debugging
+	const auto pose = chassis.getPose();
+	pros::screen::set_pen(WHITE);
+	pros::screen::print(pros::E_TEXT_SMALL, 10, 220, "X: %.2f, Y: %.2f, Heading: %.2f", pose.x, pose.y, pose.theta);
+	
 }
 
 
@@ -675,6 +681,7 @@ void initialize() {
 	// --------------------------------------------------------
 
 	chassis.calibrate(false);
+	vertical_sensor.reset_position();
 
 	printf("2: after calibrate\n");
 
