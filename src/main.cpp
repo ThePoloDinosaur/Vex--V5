@@ -93,9 +93,7 @@ pros::Controller controller(
 // kD = how strongly it reacts to rate of change
 //
 //
-//
-// Set kP = 2, kI = 0, kD = 5
-// Increase kP by 2 each time until it is fast and overshoots
+//AqaZ
 // Increase kD by 5 each time until it doesn't overshoot
 // Increase kI by 0.001 if it is barely undershooting
 //
