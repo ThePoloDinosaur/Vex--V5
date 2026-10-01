@@ -44,11 +44,11 @@ pros::Imu imu(16);
 
 
 // ----------------------Tracking-Wheels-----------------------
-pros::Rotation vertical_encoder(4);
+pros::Rotation vertical_sensor(-4);
 
 
 lemlib::TrackingWheel vertical_tracking_wheel(
-	&vertical_encoder,
+	&vertical_sensor,
 	lemlib::Omniwheel::NEW_2,0
 );
 
