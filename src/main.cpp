@@ -52,12 +52,12 @@ pros::adi::Pneumatics piston(
 
 
 pros::Imu imu(
-	'4'
+	(4),
 );
 
 
 // ----------------------Tracking-Wheels-----------------------
-pros::Rotation horizontal_encoder(4);
+pros::Rotation vertical_encoder(4);
 
 
 // -------------------- CONTROLLER ----------------------------
@@ -170,11 +170,6 @@ lemlib::Drivetrain drivetrain(
 // ODOMETRY SENSORS
 // ============================================================
 //
-// You do NOT have:
-//
-// - Tracking wheels
-// - IMU
-//
 // So every dedicated sensor is nullptr.
 //
 // LemLib will use the drivetrain motor encoders for its
@@ -183,7 +178,7 @@ lemlib::Drivetrain drivetrain(
 
 
 lemlib::OdomSensors sensors(
-	nullptr,    // vertical tracking wheel 1
+	vertical_encoder,    // vertical tracking wheel 1
 	nullptr,    // vertical tracking wheel 2
 	nullptr,    // horizontal tracking wheel 1
 	nullptr,    // horizontal tracking wheel 2
@@ -809,9 +804,6 @@ void auton_selector_task() {
 
 void initialize() {
 
-	chassis.setPose(0, 0, 0);       // Reset position/heading to 0
-    chassis.turnToHeading(90, 100000); // Turn to 90 degrees with a very
-
 
 	// Set screen colors
 	pros::screen::set_eraser(BLACK);
@@ -1051,26 +1043,10 @@ void opcontrol() {
 			);
 
 
-		int leftSpeed =
-			std::clamp(
-				leftY + rightX,
-				-127,
-				127
-			);
-
-
-		int rightSpeed =
-			std::clamp(
-				leftY - rightX,
-				-127,
-				127
-			);
-
-
-		left_motors.move(leftSpeed);
-
-
-		right_motors.move(rightSpeed);
+		chassis.arcadeDrive(
+			leftY,
+			rightX
+		);
 
 
 		// ====================================================
