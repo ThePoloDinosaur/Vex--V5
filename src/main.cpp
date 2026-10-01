@@ -96,7 +96,7 @@ pros::Controller controller(pros::E_CONTROLLER_MASTER);
 
 
 lemlib::ControllerSettings lateral_controller(
-	10,     // kP
+	11,     // kP
 	0,      // kI
 	3,      // kD
 	3,      // anti-windup
@@ -379,7 +379,7 @@ void draw_battery() {
 
 	pros::screen::set_pen(LIGHT_GRAY);
 
-	pros::screen::print(pros::E_TEXT_SMALL, 420, 18, "%d%%", battery);
+	pros::screen::print(pros::E_TEXT_LARGE, 420, 18, "%d%%", battery);
 }
 
 
@@ -835,7 +835,6 @@ void opcontrol() {
 
 
 			lift_motors.move_velocity(0);
-			lift_motors.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 		}
 
 

@@ -30,7 +30,7 @@ void pid_lateral_auton() {
 
 
 	chassis.setPose(0, 0, 0);
-	chassis.moveToPoint(0,48,5000);
+	chassis.moveToPoint(0,48,50000);
 }
 
 
