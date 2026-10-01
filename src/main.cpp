@@ -11,6 +11,16 @@
 #include <algorithm> // No idea what this does, but it was in the original code. I think it has something to do with the clamp function.
 #include <cstring>
 
+
+struct DebugPrint {
+	DebugPrint(const char* text) {
+		printf("%s\n", text);
+	}
+};
+
+
+DebugPrint debug_a("A: program started");
+
 // ============================================================
 // ROBOT HARDWARE
 // ============================================================
@@ -44,11 +54,11 @@ pros::Imu imu(16);
 
 
 // ----------------------Tracking-Wheels-----------------------
-pros::Rotation vertical_encoder(4);
+pros::Rotation vertical_sensor(-4);
 
 
 lemlib::TrackingWheel vertical_tracking_wheel(
-	&vertical_encoder,
+	&vertical_sensor,
 	lemlib::Omniwheel::NEW_2,0
 );
 
@@ -190,6 +200,9 @@ lemlib::Chassis chassis(
 );
 
 
+DebugPrint debug_b("B: hardware setup done");
+
+
 // ============================================================
 // AUTONOMOUS MODES
 // ============================================================
@@ -261,32 +274,23 @@ struct Button {
 // BUTTON LOCATIONS
 // ============================================================
 
-
 const Button driverwall_button = {20, 65, 225, 167};
-
 
 const Button sidewall_button = {255, 65, 460, 167};
 
-
 const Button skills_button = {20, 176, 225, 216};
-
 
 const Button pid_tuning_button = {255, 176, 460, 216};
 
-
 const Button back_button = {8, 8, 88, 42};
-
 
 const Button lateral_button = {20, 65, 225, 167};
 
-
 const Button angular_button = {255, 65, 460, 167};
-
 
 // ============================================================
 // DRAW BUTTON
 // ============================================================
-
 
 void draw_button(const Button& button, int fill_color, int border_color) {
 
@@ -294,13 +298,10 @@ void draw_button(const Button& button, int fill_color, int border_color) {
 	// Fill
 	pros::screen::set_pen(fill_color);
 
-
 	pros::screen::fill_rect(button.x1, button.y1, button.x2, button.y2);
-
 
 	// Border
 	pros::screen::set_pen(border_color);
-
 
 	pros::screen::draw_rect(button.x1, button.y1, button.x2, button.y2);
 }
@@ -308,9 +309,7 @@ void draw_button(const Button& button, int fill_color, int border_color) {
 
 void print_centered(pros::text_format_e_t format, int char_width, int center_x, int y, const char* text) {
 
-
 	int text_width = std::strlen(text) * char_width;
-
 
 	pros::screen::print(format, center_x - text_width / 2, y, "%s", text);
 }
@@ -323,15 +322,11 @@ void print_centered(pros::text_format_e_t format, int char_width, int center_x, 
 
 void draw_button_text(const Button& button, const char* text) {
 
-
 	int center_x = (button.x1 + button.x2) / 2;
-
 
 	int center_y = (button.y1 + button.y2) / 2;
 
-
 	pros::screen::set_pen(WHITE);
-
 
 	print_centered(pros::E_TEXT_MEDIUM, 10, center_x, center_y - 7, text);
 }
@@ -378,15 +373,11 @@ void draw_battery() {
 
 	pros::screen::set_pen(DARK_GRAY);
 
-
 	pros::screen::fill_rect(405, 10, 479, 40);
-
 
 	int battery = pros::battery::get_capacity();
 
-
 	pros::screen::set_pen(LIGHT_GRAY);
-
 
 	pros::screen::print(pros::E_TEXT_SMALL, 420, 18, "%d%%", battery);
 }
@@ -394,15 +385,11 @@ void draw_battery() {
 
 void draw_selected_bar() {
 
-
 	pros::screen::set_pen(GRAY);
-
 
 	pros::screen::fill_rect(15, 224, 465, 239);
 
-
 	pros::screen::set_pen(WHITE);
-
 
 	pros::screen::print(pros::E_TEXT_SMALL, 25, 229, "SELECTED: %s", get_auton_name());
 }
@@ -418,79 +405,58 @@ void draw_auton_gui() {
 
 	pros::screen::set_pen(BLACK);
 
-
 	pros::screen::fill_rect(0, 50, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1);
-
 
 	// --------------------------------------------------------
 	// HEADER
 	// --------------------------------------------------------
 
-
 	pros::screen::set_pen(DARK_GRAY);
 
-
 	pros::screen::fill_rect(0, 0, 479, 49);
-
 
 	// Header title
 	pros::screen::set_pen(WHITE);
 
-
 	print_centered(pros::E_TEXT_LARGE, 20, 240, 8, "AUTON SELECTOR");
-
 
 	// --------------------------------------------------------
 	// BATTERY
 	// --------------------------------------------------------
 
-
 	draw_battery();
-
 
 	// --------------------------------------------------------
 	// DRIVER WALL BUTTON
 	// --------------------------------------------------------
 
-
 	draw_button(driverwall_button, selected_auton == DRIVERWALL ? RED : RED_DARK, RED);
 
-
 	draw_button_text(driverwall_button, "DRIVER WALL");
-
 
 	// --------------------------------------------------------
 	// SIDE WALL BUTTON
 	// --------------------------------------------------------
 
-
 	draw_button(sidewall_button, selected_auton == SIDEWALL ? BLUE : BLUE_DARK, BLUE);
 
-
 	draw_button_text(sidewall_button, "SIDE WALL");
-
 
 	// --------------------------------------------------------
 	// SKILLS BUTTON
 	// --------------------------------------------------------
 
-
 	draw_button(skills_button, selected_auton == SKILLS ? GREEN : GREEN_DARK, GREEN);
-
 
 	draw_button_text(skills_button, "SKILLS");
 
-
 	draw_button(pid_tuning_button, selected_auton == PID_LATERAL || selected_auton == PID_ANGULAR ? LIGHT_GRAY : GRAY, LIGHT_GRAY);
 
-
 	draw_button_text(pid_tuning_button, "PID TUNING");
-
 
 	// --------------------------------------------------------
 	// SELECTED BAR
 	// --------------------------------------------------------
-
 
 	draw_selected_bar();
 }
@@ -498,45 +464,31 @@ void draw_auton_gui() {
 
 void draw_pid_gui() {
 
-
 	pros::screen::set_pen(BLACK);
-
 
 	pros::screen::fill_rect(0, 50, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1);
 
-
 	pros::screen::set_pen(DARK_GRAY);
-
 
 	pros::screen::fill_rect(0, 0, 479, 49);
 
-
 	pros::screen::set_pen(WHITE);
-
 
 	print_centered(pros::E_TEXT_LARGE, 20, 240, 8, "PID TUNING");
 
-
 	draw_battery();
-
 
 	draw_button(back_button, GRAY, LIGHT_GRAY);
 
-
 	draw_button_text(back_button, "< BACK");
-
 
 	draw_button(lateral_button, selected_auton == PID_LATERAL ? LIGHT_GRAY : GRAY, LIGHT_GRAY);
 
-
 	draw_button_text(lateral_button, "LATERAL");
-
 
 	draw_button(angular_button, selected_auton == PID_ANGULAR ? LIGHT_GRAY : GRAY, LIGHT_GRAY);
 
-
 	draw_button_text(angular_button, "ANGULAR");
-
 
 	draw_selected_bar();
 }
@@ -548,7 +500,6 @@ void draw_pid_gui() {
 
 
 bool inside_button(const Button& button, int x, int y) {
-
 
 	return x >= button.x1 && x <= button.x2 && y >= button.y1 && y <= button.y2;
 }
@@ -717,34 +668,33 @@ pros::Task* selector_task = nullptr;
 
 void initialize() {
 
+	printf("1: initialize started\n");
+
+	// --------------------------------------------------------
+	// Initialize LemLib
+	// --------------------------------------------------------
+
+	chassis.calibrate(false);
+
+	printf("2: after calibrate\n");
 
 	// Set screen colors
 	pros::screen::set_eraser(BLACK);
 
-
 	pros::screen::erase();
-
 
 	// Draw selector
 	draw_auton_gui();
 
+	printf("3: gui drawn\n");
 
 	// --------------------------------------------------------
 	// Create touchscreen task
 	// --------------------------------------------------------
 
-
 	selector_task = new pros::Task(auton_selector_task);
 
-
-
-	// --------------------------------------------------------
-	// Initialize LemLib
-	// --------------------------------------------------------
-	//
-
-	//
-	chassis.calibrate();
+	printf("4: task started\n");
 }
 
 
@@ -852,6 +802,9 @@ void autonomous() {
 
 
 void opcontrol() {
+
+
+	printf("5: opcontrol started\n");
 
 
 	bool piston_last = false;
