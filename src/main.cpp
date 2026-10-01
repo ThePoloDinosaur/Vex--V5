@@ -7,6 +7,7 @@
 #include "pros/rotation.hpp"
 #include "pros/rtos.hpp"
 #include "pros/screen.hpp"
+#include "autons.hpp"
 #include <algorithm> // No idea what this does, but it was in the original code. I think it has something to do with the clamp function.
 
 
@@ -52,12 +53,19 @@ pros::adi::Pneumatics piston(
 
 
 pros::Imu imu(
-	(4),
+	4
 );
 
 
 // ----------------------Tracking-Wheels-----------------------
-pros::Rotation vertical_encoder(4);
+pros::Rotation vertical_encoder(5);
+
+
+lemlib::TrackingWheel vertical_tracking_wheel(
+	&vertical_encoder,
+	lemlib::Omniwheel::NEW_2,
+	0
+);
 
 
 // -------------------- CONTROLLER ----------------------------
@@ -178,7 +186,7 @@ lemlib::Drivetrain drivetrain(
 
 
 lemlib::OdomSensors sensors(
-	vertical_encoder,    // vertical tracking wheel 1
+	&vertical_tracking_wheel,    // vertical tracking wheel 1
 	nullptr,    // vertical tracking wheel 2
 	nullptr,    // horizontal tracking wheel 1
 	nullptr,    // horizontal tracking wheel 2
@@ -205,16 +213,19 @@ lemlib::Chassis chassis(
 
 
 enum Auton {
-	RED_LEFT,
-	RED_RIGHT,
-	BLUE_LEFT,
-	BLUE_RIGHT,
-	SKILLS
+	DRIVERWALL,
+	SIDEWALL,
+	SKILLS,
+	PID_LATERAL,
+	PID_ANGULAR
 };
 
 
 // Default auton
-Auton selected_auton = RED_LEFT;
+Auton selected_auton = DRIVERWALL;
+
+
+bool on_pid_screen = false;
 
 
 // ============================================================
@@ -268,28 +279,38 @@ struct Button {
 // ============================================================
 
 
-const Button red_left_button = {
-	20, 65, 225, 112
+const Button driverwall_button = {
+	20, 65, 225, 167
 };
 
 
-const Button blue_left_button = {
-	255, 65, 460, 112
-};
-
-
-const Button red_right_button = {
-	20, 120, 225, 167
-};
-
-
-const Button blue_right_button = {
-	255, 120, 460, 167
+const Button sidewall_button = {
+	255, 65, 460, 167
 };
 
 
 const Button skills_button = {
-	95, 176, 385, 216
+	20, 176, 225, 216
+};
+
+
+const Button pid_tuning_button = {
+	255, 176, 460, 216
+};
+
+
+const Button back_button = {
+	8, 8, 88, 42
+};
+
+
+const Button lateral_button = {
+	20, 65, 225, 167
+};
+
+
+const Button angular_button = {
+	255, 65, 460, 167
 };
 
 
@@ -373,28 +394,86 @@ const char* get_auton_name() {
 	switch (selected_auton) {
 
 
-		case RED_LEFT:
-			return "RED LEFT";
+		case DRIVERWALL:
+			return "DRIVER WALL";
 
 
-		case RED_RIGHT:
-			return "RED RIGHT";
-
-
-		case BLUE_LEFT:
-			return "BLUE LEFT";
-
-
-		case BLUE_RIGHT:
-			return "BLUE RIGHT";
+		case SIDEWALL:
+			return "SIDE WALL";
 
 
 		case SKILLS:
 			return "SKILLS";
+
+
+		case PID_LATERAL:
+			return "PID LATERAL";
+
+
+		case PID_ANGULAR:
+			return "PID ANGULAR";
 	}
 
 
 	return "UNKNOWN";
+}
+
+
+void draw_battery() {
+
+
+	pros::screen::set_pen(DARK_GRAY);
+
+
+	pros::screen::fill_rect(
+		405,
+		10,
+		479,
+		40
+	);
+
+
+	int battery =
+		pros::battery::get_capacity();
+
+
+	pros::screen::set_pen(LIGHT_GRAY);
+
+
+	pros::screen::print(
+		pros::E_TEXT_SMALL,
+		420,
+		18,
+		"%d%%",
+		battery
+	);
+}
+
+
+void draw_selected_bar() {
+
+
+	pros::screen::set_pen(GRAY);
+
+
+	pros::screen::fill_rect(
+		15,
+		224,
+		465,
+		239
+	);
+
+
+	pros::screen::set_pen(WHITE);
+
+
+	pros::screen::print(
+		pros::E_TEXT_SMALL,
+		25,
+		229,
+		"SELECTED: %s",
+		get_auton_name()
+	);
 }
 
 
@@ -406,17 +485,12 @@ const char* get_auton_name() {
 void draw_auton_gui() {
 
 
-	// --------------------------------------------------------
-	// BACKGROUND
-	// --------------------------------------------------------
-
-
 	pros::screen::set_pen(BLACK);
 
 
 	pros::screen::fill_rect(
 		0,
-		0,
+		50,
 		SCREEN_WIDTH - 1,
 		SCREEN_HEIGHT - 1
 	);
@@ -455,32 +529,19 @@ void draw_auton_gui() {
 	// --------------------------------------------------------
 
 
-	int battery =
-		pros::battery::get_capacity();
-
-
-	pros::screen::set_pen(LIGHT_GRAY);
-
-
-	pros::screen::print(
-		pros::E_TEXT_SMALL,
-		420,
-		18,
-		"%d%%",
-		battery
-	);
+	draw_battery();
 
 
 	// --------------------------------------------------------
-	// RED LEFT BUTTON
+	// DRIVER WALL BUTTON
 	// --------------------------------------------------------
 
 
 	draw_button(
-		red_left_button,
+		driverwall_button,
 
 
-		selected_auton == RED_LEFT
+		selected_auton == DRIVERWALL
 			? RED
 			: RED_DARK,
 
@@ -490,21 +551,21 @@ void draw_auton_gui() {
 
 
 	draw_button_text(
-		red_left_button,
-		"RED LEFT"
+		driverwall_button,
+		"DRIVER WALL"
 	);
 
 
 	// --------------------------------------------------------
-	// BLUE LEFT BUTTON
+	// SIDE WALL BUTTON
 	// --------------------------------------------------------
 
 
 	draw_button(
-		blue_left_button,
+		sidewall_button,
 
 
-		selected_auton == BLUE_LEFT
+		selected_auton == SIDEWALL
 			? BLUE
 			: BLUE_DARK,
 
@@ -514,56 +575,8 @@ void draw_auton_gui() {
 
 
 	draw_button_text(
-		blue_left_button,
-		"BLUE LEFT"
-	);
-
-
-	// --------------------------------------------------------
-	// RED RIGHT BUTTON
-	// --------------------------------------------------------
-
-
-	draw_button(
-		red_right_button,
-
-
-		selected_auton == RED_RIGHT
-			? RED
-			: RED_DARK,
-
-
-		RED
-	);
-
-
-	draw_button_text(
-		red_right_button,
-		"RED RIGHT"
-	);
-
-
-	// --------------------------------------------------------
-	// BLUE RIGHT BUTTON
-	// --------------------------------------------------------
-
-
-	draw_button(
-		blue_right_button,
-
-
-		selected_auton == BLUE_RIGHT
-			? BLUE
-			: BLUE_DARK,
-
-
-		BLUE
-	);
-
-
-	draw_button_text(
-		blue_right_button,
-		"BLUE RIGHT"
+		sidewall_button,
+		"SIDE WALL"
 	);
 
 
@@ -591,19 +604,57 @@ void draw_auton_gui() {
 	);
 
 
+	draw_button(
+		pid_tuning_button,
+
+
+		selected_auton == PID_LATERAL ||
+		selected_auton == PID_ANGULAR
+			? LIGHT_GRAY
+			: GRAY,
+
+
+		LIGHT_GRAY
+	);
+
+
+	draw_button_text(
+		pid_tuning_button,
+		"PID TUNING"
+	);
+
+
 	// --------------------------------------------------------
 	// SELECTED BAR
 	// --------------------------------------------------------
 
 
-	pros::screen::set_pen(GRAY);
+	draw_selected_bar();
+}
+
+
+void draw_pid_gui() {
+
+
+	pros::screen::set_pen(BLACK);
 
 
 	pros::screen::fill_rect(
-		15,
-		224,
-		465,
-		239
+		0,
+		50,
+		SCREEN_WIDTH - 1,
+		SCREEN_HEIGHT - 1
+	);
+
+
+	pros::screen::set_pen(DARK_GRAY);
+
+
+	pros::screen::fill_rect(
+		0,
+		0,
+		479,
+		49
 	);
 
 
@@ -611,12 +662,68 @@ void draw_auton_gui() {
 
 
 	pros::screen::print(
-		pros::E_TEXT_SMALL,
-		25,
-		229,
-		"SELECTED: %s",
-		get_auton_name()
+		pros::E_TEXT_LARGE_CENTER,
+		240,
+		8,
+		"PID TUNING"
 	);
+
+
+	draw_battery();
+
+
+	draw_button(
+		back_button,
+		GRAY,
+		LIGHT_GRAY
+	);
+
+
+	draw_button_text(
+		back_button,
+		"< BACK"
+	);
+
+
+	draw_button(
+		lateral_button,
+
+
+		selected_auton == PID_LATERAL
+			? LIGHT_GRAY
+			: GRAY,
+
+
+		LIGHT_GRAY
+	);
+
+
+	draw_button_text(
+		lateral_button,
+		"LATERAL"
+	);
+
+
+	draw_button(
+		angular_button,
+
+
+		selected_auton == PID_ANGULAR
+			? LIGHT_GRAY
+			: GRAY,
+
+
+		LIGHT_GRAY
+	);
+
+
+	draw_button_text(
+		angular_button,
+		"ANGULAR"
+	);
+
+
+	draw_selected_bar();
 }
 
 
@@ -652,6 +759,9 @@ void auton_selector_task() {
 	int last_press_count = 0;
 
 
+	int battery_loops = 0;
+
+
 	while (true) {
 
 
@@ -678,108 +788,138 @@ void auton_selector_task() {
 			int y = touch.y;
 
 
-			// ------------------------------------------------
-			// RED LEFT
-			// ------------------------------------------------
+			if (on_pid_screen) {
 
 
-			if (
-				inside_button(
-					red_left_button,
-					x,
-					y
-				)
-			) {
+				if (
+					inside_button(
+						back_button,
+						x,
+						y
+					)
+				) {
 
 
-				selected_auton = RED_LEFT;
+					on_pid_screen = false;
 
 
-				draw_auton_gui();
+					draw_auton_gui();
+				}
+
+
+				else if (
+					inside_button(
+						lateral_button,
+						x,
+						y
+					)
+				) {
+
+
+					selected_auton = PID_LATERAL;
+
+
+					draw_pid_gui();
+				}
+
+
+				else if (
+					inside_button(
+						angular_button,
+						x,
+						y
+					)
+				) {
+
+
+					selected_auton = PID_ANGULAR;
+
+
+					draw_pid_gui();
+				}
 			}
 
 
-			// ------------------------------------------------
-			// BLUE LEFT
-			// ------------------------------------------------
+			else {
 
 
-			else if (
-				inside_button(
-					blue_left_button,
-					x,
-					y
-				)
-			) {
+				// ------------------------------------------------
+				// DRIVER WALL
+				// ------------------------------------------------
 
 
-				selected_auton = BLUE_LEFT;
+				if (
+					inside_button(
+						driverwall_button,
+						x,
+						y
+					)
+				) {
 
 
-				draw_auton_gui();
-			}
+					selected_auton = DRIVERWALL;
 
 
-			// ------------------------------------------------
-			// RED RIGHT
-			// ------------------------------------------------
+					draw_auton_gui();
+				}
 
 
-			else if (
-				inside_button(
-					red_right_button,
-					x,
-					y
-				)
-			) {
+				// ------------------------------------------------
+				// SIDE WALL
+				// ------------------------------------------------
 
 
-				selected_auton = RED_RIGHT;
+				else if (
+					inside_button(
+						sidewall_button,
+						x,
+						y
+					)
+				) {
 
 
-				draw_auton_gui();
-			}
+					selected_auton = SIDEWALL;
 
 
-			// ------------------------------------------------
-			// BLUE RIGHT
-			// ------------------------------------------------
+					draw_auton_gui();
+				}
 
 
-			else if (
-				inside_button(
-					blue_right_button,
-					x,
-					y
-				)
-			) {
+				// ------------------------------------------------
+				// SKILLS
+				// ------------------------------------------------
 
 
-				selected_auton = BLUE_RIGHT;
+				else if (
+					inside_button(
+						skills_button,
+						x,
+						y
+					)
+				) {
 
 
-				draw_auton_gui();
-			}
+					selected_auton = SKILLS;
 
 
-			// ------------------------------------------------
-			// SKILLS
-			// ------------------------------------------------
+					draw_auton_gui();
+				}
 
 
-			else if (
-				inside_button(
-					skills_button,
-					x,
-					y
-				)
-			) {
+				else if (
+					inside_button(
+						pid_tuning_button,
+						x,
+						y
+					)
+				) {
 
 
-				selected_auton = SKILLS;
+					on_pid_screen = true;
 
 
-				draw_auton_gui();
+					draw_pid_gui();
+				}
 			}
 		}
 
@@ -789,14 +929,26 @@ void auton_selector_task() {
 		// ----------------------------------------------------
 
 
-		draw_auton_gui();
+		battery_loops++;
 
 
-		pros::delay(250);
+		if (
+			battery_loops >= 50
+		) {
+
+
+			battery_loops = 0;
+
+
+			draw_battery();
+		}
+
+
+		pros::delay(20);
 	}
 }
 
-
+pros::Task* selector_task = nullptr;
 // ============================================================
 // INITIALIZE
 // ============================================================
@@ -821,12 +973,10 @@ void initialize() {
 	// --------------------------------------------------------
 
 
-	static pros::Task selector_task(
+	selector_task = new pros::Task(
 		auton_selector_task
-
-
-		
 	);
+
 
 
 	// --------------------------------------------------------
@@ -836,7 +986,7 @@ void initialize() {
 	// You have no IMU, so there is nothing to calibrate there.
 	// This still initializes the chassis/odometry system.
 	//
-	chassis.calibrate(false);
+	chassis.calibrate();
 }
 
 
@@ -846,7 +996,6 @@ void initialize() {
 
 
 void disabled() {
-
 
 	left_motors.move(0);
 	right_motors.move(0);
@@ -863,13 +1012,11 @@ void autonomous() {
 
 
 	// --------------------------------------------------------
-	// Set starting position
+	// GUI
 	// --------------------------------------------------------
 
-	
 
 
-/*
 	// --------------------------------------------------------
 	// SELECTED AUTON
 	// --------------------------------------------------------
@@ -879,75 +1026,28 @@ void autonomous() {
 
 
 		// ====================================================
-		// RED LEFT
+		// DRIVER WALL
 		// ====================================================
 
 
-		case RED_LEFT:
+		case DRIVERWALL:
 
 
-			// TEST:
-			// Drive forward 24 inches
-
-
-			chassis.turnToHeading(90, 100000);
+			driverwall_auton();
 
 
 			break;
 
 
 		// ====================================================
-		// RED RIGHT
+		// SIDE WALL
 		// ====================================================
 
 
-		case RED_RIGHT:
+		case SIDEWALL:
 
 
-			// TEST:
-			// Drive forward 24 inches
-
-
-
-
-			break;
-
-
-		// ====================================================
-		// BLUE LEFT
-		// ====================================================
-
-
-		case BLUE_LEFT:
-
-
-			// TEST:
-			// Drive forward 24 inches
-
-
-			chassis.turnToHeading(90, 100000);
-
-
-			break;
-
-
-		// ====================================================
-		// BLUE RIGHT
-		// ====================================================
-
-
-		case BLUE_RIGHT:
-
-
-			// TEST:
-			// Drive forward 24 inches
-
-
-			chassis.moveToPoint(
-				0,
-				24,
-				3000
-			);
+			sidewall_auton();
 
 
 			break;
@@ -961,20 +1061,30 @@ void autonomous() {
 		case SKILLS:
 
 
-			// TEST:
-			// Drive forward 24 inches
+			skills_auton();
 
 
-			chassis.moveToPoint(
-				0,
-				24,
-				3000
-			);
+			break;
+
+
+		case PID_LATERAL:
+
+
+			pid_lateral_auton();
+
+
+			break;
+
+
+		case PID_ANGULAR:
+
+
+			pid_angular_auton();
 
 
 			break;
 	}
-	*/
+
 }
 
 
@@ -1043,7 +1153,7 @@ void opcontrol() {
 			);
 
 
-		chassis.arcadeDrive(
+		chassis.arcade(
 			leftY,
 			rightX
 		);
