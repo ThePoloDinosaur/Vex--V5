@@ -28,7 +28,7 @@ void driverwall_auton() {
 	chassis.moveToPose(0,-24,0,1000, {.forwards = false, .maxSpeed = 200});
 	chassis.turnToPoint(-19.5,0,1000);
 	chassis.moveToPoint(-19.5,0,1000, {.maxSpeed = 80});
-	ros::delay(300);
+	pros::delay(300);
 	chassis.moveToPoint(-20.5,1,1000, {.maxSpeed = 10});
 	pros::delay(1600);
 	piston.set_value(true);
