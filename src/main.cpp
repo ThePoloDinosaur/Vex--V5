@@ -96,15 +96,15 @@ pros::Controller controller(pros::E_CONTROLLER_MASTER);
 
 
 lemlib::ControllerSettings lateral_controller(
-	6.2,   // kP - Lowered significantly to prevent violent launching
-	0.011,     // kI
-	2,    // kD - Adjusted relative to the new kP
+	9,   // kP - Lowered significantly to prevent violent launching
+	0.001,     // kI
+	0,    // kD - Adjusted relative to the new kP
 	3,     // anti-windup
-	1,     // small error range (inches)
+	1.5,     // small error range (inches)
 	100,   // small error timeout (ms)
-	3,     // large error range (inches) <-- Increased to give it space to slow down
+	5.5,     // large error range (inches) <-- Increased to give it space to slow down
 	500,   // large error timeout (ms)
-	8      // maximum acceleration / slew <-- Lowered to smooth out the initial start
+	20	     // maximum acceleration / slew <-- Lowered to smooth out the initial start
 );
 
 
@@ -161,7 +161,7 @@ lemlib::Drivetrain drivetrain(
 	lemlib::Omniwheel::NEW_2,    // 2.75" omni wheels
 
 
-	450,                            // drivetrain RPM
+	600,                            // drivetrain RPM
 
 
 	2                               // horizontal drift
