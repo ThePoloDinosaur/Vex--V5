@@ -96,16 +96,17 @@ pros::Controller controller(pros::E_CONTROLLER_MASTER);
 
 
 lemlib::ControllerSettings lateral_controller(
-	11,     // kP
-	0,      // kI
-	10,      // kD
-	3,      // anti-windup
-	1,      // small error range (inches)
-	100,    // small error timeout (ms) <-- Adjusted from 10
-	3,      // large error range (inches) <-- Re-separated from small error
-	500,    // large error timeout (ms) <-- Adjusted from 50
-	20      // maximum acceleration / slew
+	6.2,   // kP - Lowered significantly to prevent violent launching
+	0.011,     // kI
+	2,    // kD - Adjusted relative to the new kP
+	3,     // anti-windup
+	1,     // small error range (inches)
+	100,   // small error timeout (ms)
+	3,     // large error range (inches) <-- Increased to give it space to slow down
+	500,   // large error timeout (ms)
+	8      // maximum acceleration / slew <-- Lowered to smooth out the initial start
 );
+
 
 
 // ------------------------------------------------------------
@@ -121,11 +122,11 @@ lemlib::ControllerSettings lateral_controller(
 lemlib::ControllerSettings angular_controller(
 	2,      // kP
 	0,      // kI
-	10,     // kD
+	13,     // kD
 	3,      // anti-windup
 	1,      // small error range (degrees)
 	100,    // small error timeout (ms)
-	3,      // large error range (degrees)
+	1,      // large error range (degrees)
 	500,    // large error timeout (ms)
 	0       // maximum acceleration / slew
 );
@@ -673,6 +674,7 @@ pros::Task* selector_task = nullptr;
 
 
 void initialize() {
+	lift_motors.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
 
 	printf("1: initialize started\n");
 
@@ -680,7 +682,7 @@ void initialize() {
 	// Initialize LemLib
 	// --------------------------------------------------------
 
-	chassis.calibrate(false);
+	chassis.calibrate(true);
 	vertical_sensor.reset_position();
 
 	printf("2: after calibrate\n");
@@ -702,6 +704,8 @@ void initialize() {
 	selector_task = new pros::Task(auton_selector_task);
 
 	printf("4: task started\n");
+	printf(pros::Imu(16).is_calibrating() ? "IMU is calibrating\n" : "IMU is not calibrating\n");
+	printf("IMU heading: %.2f\n", pros::Imu(16).get_heading());
 }
 
 
@@ -833,7 +837,6 @@ void opcontrol() {
 
 
 		else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
-			lift_motors.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
 			lift_motors.move_velocity(-200);
 		}
 
