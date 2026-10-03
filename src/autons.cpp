@@ -18,6 +18,7 @@ void driverwall_auton() {
 	chassis.moveToPoint(10.5, 13.5, 800);
 	lift_motors.move_velocity(0);
 	chassis.moveToPoint(20, 13.5, 500);
+	pros::delay(200);
 	piston.set_value(false);
 	pros::delay(50);
 	chassis.setPose(0, 0, 0);
