@@ -1,5 +1,6 @@
 #include "liblvgl/draw/lv_draw.h"
 #include "main.h"
+#include "pros/rtos.h"
 #include "autons.hpp"
 
 
@@ -34,14 +35,25 @@ void driverwall_auton() {
 	piston.set_value(true);
 	pros::delay(1000);
 	lift_motors.move_velocity(-200);
-	pros::delay(4500);
+	pros::delay(1500);
 	lift_motors.move_velocity(0);
 	chassis.moveToPoint(-24,7,1000, {.maxSpeed = 200});
 	pros::delay(300);
 	chassis.turnToHeading(90,1000);
 	pros::delay(300);
-	chassis.moveToPoint(0,7,1000, {.maxSpeed = 200});
-
+	chassis.moveToPoint(-3,7,1000, {.maxSpeed = 100});
+	pros::delay(300);
+	lift_motors.move_velocity(200);
+	pros::delay(300);
+	lift_motors.move_velocity(0);
+	pros::delay(300);
+	piston.set_value(false);
+	pros::delay(300);
+	chassis.setPose(0, 0, 0);
+	pros::delay(300);
+	chassis.moveToPoint(0,-22,1000, {.forwards = false, .maxSpeed = 200});
+	chassis.turnToHeading(45,1000);
+	
 }
 
 void sidewall_auton() {
