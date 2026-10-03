@@ -395,6 +395,26 @@ void draw_selected_bar() {
 }
 
 
+void draw_pose() {
+
+	lemlib::Pose pose = chassis.getPose();
+
+	char text[64];
+
+	snprintf(text, sizeof(text), "X: %.2f, Y: %.2f, Heading: %.2f", pose.x, pose.y, pose.theta);
+
+	pros::screen::set_pen(GRAY);
+
+	pros::screen::fill_rect(180, 224, 465, 239);
+
+	int text_width = std::strlen(text) * 7;
+
+	pros::screen::set_pen(WHITE);
+
+	pros::screen::print(pros::E_TEXT_SMALL, 460 - text_width, 229, "%s", text);
+}
+
+
 // ============================================================
 // DRAW AUTON SELECTOR
 // ============================================================
@@ -460,11 +480,7 @@ void draw_auton_gui() {
 
 	draw_selected_bar();
 
-	// Print current position for debugging
-	const auto pose = chassis.getPose();
-	pros::screen::set_pen(WHITE);
-	pros::screen::print(pros::E_TEXT_SMALL, 10, 220, "X: %.2f, Y: %.2f, Heading: %.2f", pose.x, pose.y, pose.theta);
-	
+	draw_pose();
 }
 
 
@@ -497,6 +513,8 @@ void draw_pid_gui() {
 	draw_button_text(angular_button, "ANGULAR");
 
 	draw_selected_bar();
+
+	draw_pose();
 }
 
 
@@ -522,6 +540,9 @@ void auton_selector_task() {
 
 
 	int battery_loops = 0;
+
+
+	int pose_loops = 0;
 
 	pros::delay(100);
 
@@ -659,6 +680,19 @@ void auton_selector_task() {
 
 
 			draw_battery();
+		}
+
+
+		pose_loops++;
+
+
+		if (pose_loops >= 5) {
+
+
+			pose_loops = 0;
+
+
+			draw_pose();
 		}
 
 
