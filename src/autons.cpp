@@ -25,12 +25,12 @@ void driverwall_auton() {
 	pros::delay(300);
 	chassis.moveToPose(0,-24,0,1000, {.forwards = false, .maxSpeed = 200});
 	pros::delay(300);
-	chassis.turnToPoint(-19,0,1000);
+	chassis.turnToPoint(-18,-1,1000);
 	pros::delay(300);
-	chassis.moveToPoint(-19,0,2000, {.maxSpeed = 200});
-	pros::delay(400);
+	chassis.moveToPoint(-18,-1,2000, {.maxSpeed = 200});
+	pros::delay(1500);
+	chassis.moveToPoint(-20,3,2000, {.maxSpeed = 3});
 	/*
-	chassis.moveToPoint(-19,0,2000, {.maxSpeed = 20});
 	pros::delay(1000);
 	piston.set_value(true);
 	pros::delay(1000);
