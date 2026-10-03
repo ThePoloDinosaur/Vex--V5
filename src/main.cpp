@@ -8,7 +8,6 @@
 #include "pros/rtos.hpp"
 #include "pros/screen.hpp"
 #include "autons.hpp"
-#include <algorithm> // No idea what this does, but it was in the original code. I think it has something to do with the clamp function.
 #include <cstring>
 
 
@@ -138,8 +137,8 @@ lemlib::ControllerSettings angular_controller(
 //
 // YOUR ROBOT:
 //
-// Drive motors:     6 blue motors
-// Drive speed:      600 RPM
+// Drive motors:     4 blue motors, 2 half motors
+// Drive speed:      450 RPM
 // Drive wheels:     2.75" omni wheels
 // Track width:      31.7 cm = 12.48 inches
 // Tracking wheels:  NONE
@@ -158,10 +157,10 @@ lemlib::Drivetrain drivetrain(
 	12.35,                          // track width (inches)
 
 
-	lemlib::Omniwheel::NEW_2,    // 2.75" omni wheels
+	lemlib::Omniwheel::NEW_275,    // 2.75" omni wheels
 
 
-	600,                            // drivetrain RPM
+	450,                            // drivetrain RPM
 
 
 	2                               // horizontal drift
