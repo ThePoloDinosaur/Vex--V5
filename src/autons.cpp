@@ -30,7 +30,6 @@ void driverwall_auton() {
 	chassis.moveToPoint(-18,-1,2000, {.maxSpeed = 200});
 	pros::delay(1500);
 	chassis.moveToPoint(-20,3,2000, {.maxSpeed = 3});
-	/*
 	pros::delay(1000);
 	piston.set_value(true);
 	pros::delay(1000);
@@ -42,7 +41,6 @@ void driverwall_auton() {
 	chassis.turnToHeading(90,1000);
 	pros::delay(300);
 	chassis.moveToPoint(0,7,1000, {.maxSpeed = 200});
-	*/
 
 }
 
