@@ -6,7 +6,6 @@
 
 void driverwall_auton() {
 
-
 	chassis.setPose(0, 0, 0);
 	chassis.moveToPose(0,8,0, 800); // Go forward to spring the toggle
 	chassis.moveToPose(0,-1,0,800, {.forwards = false,  }); // Go back to the wall and flip the toggle
@@ -49,13 +48,27 @@ void driverwall_auton() {
 	pros::delay(300);
 	chassis.moveToPoint(0,-22,1000, {.forwards = false}); // Back up so that the robot can turn to face the next cup-pin
 	chassis.turnToHeading(-45,1000); // Turn to face the next cup-pin
+	// Works until here, next part is to move to the next cup-pin and score it in the alliance goal if we have time, prioritize the sidewall auton before this
 }
 
 void sidewall_auton() {
 
-
 	chassis.setPose(0, 0, 0);
-	chassis.moveToPoint(0,24,3000);
+	chassis.moveToPose(0,8,0, 800); // Go forward to spring the toggle
+	chassis.moveToPose(0,-1,0,800, {.forwards = false,  }); // Go back to the wall and flip the toggle
+	chassis.moveToPose(0,8,0,800); // Go forward so the toggle can be flipped again
+	chassis.moveToPose(0,-1,0,800, {.forwards = false,  }); // Go back to the wall and flip the toggle again
+	chassis.moveToPose(0,13.5,0,800); // Go to the alliance goal y
+	chassis.turnToHeading(-90,500); // Turn to face the alliance goal
+	lift_motors.move_velocity(-30); // Lift the lift so the pin can be scored in the alliance goal
+	chassis.moveToPoint(-10.5, 13.5, 800); // Move to the alliance goal x while the lift is lifting
+	lift_motors.move_velocity(0); // Stop the lift
+	chassis.moveToPoint(-20, 13.5, 500); // Move forward to ensure the robot is aligned with the alliance goal
+	pros::delay(500);
+	piston.set_value(false); // Release the pin into the alliance goal
+	pros::delay(200);
+	chassis.setPose(0, 0, 0); // Reset the pose as the robot is in an aligned position
+	pros::delay(50);
 }
 
 
