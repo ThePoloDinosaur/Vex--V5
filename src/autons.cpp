@@ -8,11 +8,11 @@ void driverwall_auton() {
 
 
 	chassis.setPose(0, 0, 0);
-	chassis.moveToPose(0,8,0, 800, {.maxSpeed = 200});
-	chassis.moveToPose(0,-1,0,800, {.forwards = false, .maxSpeed = 200});
-	chassis.moveToPose(0,8,0,800, {.maxSpeed = 200});
-	chassis.moveToPose(0,-1,0,800, {.forwards = false, .maxSpeed = 200});
-	chassis.moveToPose(0,13.5,0,800, {.maxSpeed = 200});
+	chassis.moveToPose(0,8,0, 800);
+	chassis.moveToPose(0,-1,0,800, {.forwards = false,  });
+	chassis.moveToPose(0,8,0,800);
+	chassis.moveToPose(0,-1,0,800, {.forwards = false,  });
+	chassis.moveToPose(0,13.5,0,800);
 	chassis.turnToHeading(90,500);
 	lift_motors.move_velocity(-30);
 	chassis.moveToPoint(10.5, 13.5, 800);
@@ -23,16 +23,16 @@ void driverwall_auton() {
 	pros::delay(200);
 	chassis.setPose(0, 0, 0);
 	pros::delay(50);
-	chassis.moveToPose(0,-24,0,1000, {.forwards = false, .maxSpeed = 200});
+	chassis.moveToPose(0,-24,0,1000, {.forwards = false,  });
 	chassis.turnToPoint(-18,-1,1000);
-	chassis.moveToPoint(-18,-1,2000, {.maxSpeed = 200});
+	chassis.moveToPoint(-18,-1,2000);
 	pros::delay(200);
 	chassis.moveToPoint(-19.8,2.8,2000, {.maxSpeed = 3});
 	pros::delay(500);
 	piston.set_value(true);
 	pros::delay(800);
 	lift_motors.move_velocity(-150);
-	chassis.moveToPoint(-24,7,1000, {.maxSpeed = 200});
+	chassis.moveToPoint(-24,7,1000);
 	pros::delay(300);
 	chassis.turnToHeading(90,1000);
 	pros::delay(300);
@@ -47,7 +47,7 @@ void driverwall_auton() {
 	pros::delay(300);
 	chassis.setPose(0, 0, 0);
 	pros::delay(300);
-	chassis.moveToPoint(0,-22,1000, {.forwards = false, .maxSpeed = 200});
+	chassis.moveToPoint(0,-22,1000, {.forwards = false});
 	chassis.turnToHeading(-45,1000);
 	
 }
