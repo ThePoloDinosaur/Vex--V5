@@ -9,6 +9,7 @@
 #include "pros/screen.hpp"
 #include "autons.hpp"
 #include <cstring>
+#include <cmath>
 
 
 struct DebugPrint {
@@ -41,7 +42,66 @@ pros::MotorGroup lift_motors({-9, 14}, pros::MotorGearset::green);
 
 pros::Distance distance_sensor(6);
 
-const int LIFT_BOTTOM_MM = 0;
+
+bool lift_reading_valid(int lift_mm) {
+
+	return lift_mm != PROS_ERR && lift_mm < 9999;
+}
+
+
+void move_lift_to(int target_mm, int timeout_ms) {
+
+	bool going_to_bottom = target_mm <= LIFT_BOTTOM_MM;
+
+	int start_time = pros::millis();
+
+	while (pros::millis() - start_time < timeout_ms) {
+
+		int current_mm = distance_sensor.get();
+
+		if (!lift_reading_valid(current_mm)) {
+			break;
+		}
+
+		if (going_to_bottom) {
+
+			bool in_bottom_zone = current_mm <= LIFT_BOTTOM_MM + LIFT_TOLERANCE_MM;
+
+			bool stopped = std::abs(lift_motors.get_actual_velocity()) < 5;
+
+			if (in_bottom_zone && stopped && pros::millis() - start_time > 150) {
+				break;
+			}
+
+			int speed = current_mm < LIFT_BOTTOM_MM + 30 ? 60 : 200;
+
+			lift_motors.move_velocity(speed);
+		}
+
+		else {
+
+			int error = target_mm - current_mm;
+
+			if (std::abs(error) <= LIFT_TOLERANCE_MM) {
+				break;
+			}
+
+			int speed = std::abs(error) < 30 ? 60 : 200;
+
+			if (error > 0) {
+				lift_motors.move_velocity(-speed);
+			}
+
+			else {
+				lift_motors.move_velocity(speed);
+			}
+		}
+
+		pros::delay(20);
+	}
+
+	lift_motors.move_velocity(0);
+}
 
 
 // -------------------- PNEUMATIC -----------------------------
@@ -866,6 +926,9 @@ void opcontrol() {
 	bool piston_last = false;
 
 
+	int lift_down_time = 0;
+
+
 	while (true) {
 
 
@@ -876,18 +939,39 @@ void opcontrol() {
 
 		if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
 
+			lift_down_time += 25;
 
-			lift_motors.move_velocity(200);
+			int lift_mm = distance_sensor.get();
+
+			bool in_bottom_zone = lift_reading_valid(lift_mm) && lift_mm <= LIFT_BOTTOM_MM + LIFT_TOLERANCE_MM;
+
+			bool stopped = std::abs(lift_motors.get_actual_velocity()) < 5;
+
+			if (in_bottom_zone && stopped && lift_down_time > 150) {
+				lift_motors.move_velocity(0);
+			}
+
+			else if (lift_reading_valid(lift_mm) && lift_mm < LIFT_BOTTOM_MM + 30) {
+				lift_motors.move_velocity(60);
+			}
+
+			else {
+				lift_motors.move_velocity(200);
+			}
 		}
 
 
 		else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
+
+			lift_down_time = 0;
+
 			lift_motors.move_velocity(-200);
 		}
 
 
 		else {
 
+			lift_down_time = 0;
 
 			lift_motors.move_velocity(0);
 		}
