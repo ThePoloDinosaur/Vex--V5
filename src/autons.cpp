@@ -80,7 +80,7 @@ void sidewall_auton() {
 	lift_motors.move_velocity(-200); // Start lifting the cup-pin so it can be scored in the alliance goal
 	chassis.moveToPoint(24,7,1000); // Move to the alliance goal y while the lift is lifting
 	pros::delay(300);
-	chassis.turnToHeading(90,1000); // Turn to face the alliance goal
+	chassis.turnToHeading(-90,1000); // Turn to face the alliance goal
 	pros::delay(300);
 	chassis.moveToPoint(8,7,1000, {.maxSpeed = 80}); // Move to the alliance goal x while the lift is lifting
 	pros::delay(600);
@@ -94,7 +94,7 @@ void sidewall_auton() {
 	chassis.setPose(0, 0, 0); // Reset the pose as the robot is in an aligned position
 	pros::delay(300);
 	chassis.moveToPoint(0,-22,1000, {.forwards = false}); // Back up so that the robot can turn to face the next cup-pin
-	chassis.turnToHeading(-45,1000); // Turn to face the next cup-pin
+	chassis.turnToHeading(45,1000); // Turn to face the next cup-pin
 }
 
 
