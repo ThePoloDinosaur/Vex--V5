@@ -39,6 +39,10 @@ pros::MotorGroup right_motors({11, -12, -13}, pros::MotorGearset::blue);
 
 pros::MotorGroup lift_motors({-9, 14}, pros::MotorGearset::green);
 
+pros::Distance distance_sensor(6);
+
+const int LIFT_BOTTOM_MM = 0;
+
 
 // -------------------- PNEUMATIC -----------------------------
 
@@ -274,19 +278,19 @@ struct Button {
 // BUTTON LOCATIONS
 // ============================================================
 
-const Button driverwall_button = {20, 65, 225, 167};
+const Button driverwall_button = {20, 65, 225, 150};
 
-const Button sidewall_button = {255, 65, 460, 167};
+const Button sidewall_button = {255, 65, 460, 150};
 
-const Button skills_button = {20, 176, 225, 216};
+const Button skills_button = {20, 158, 225, 198};
 
-const Button pid_tuning_button = {255, 176, 460, 216};
+const Button pid_tuning_button = {255, 158, 460, 198};
 
 const Button back_button = {8, 8, 88, 42};
 
-const Button lateral_button = {20, 65, 225, 167};
+const Button lateral_button = {20, 65, 225, 150};
 
-const Button angular_button = {255, 65, 460, 167};
+const Button angular_button = {255, 65, 460, 150};
 
 // ============================================================
 // DRAW BUTTON
@@ -399,19 +403,27 @@ void draw_pose() {
 
 	lemlib::Pose pose = chassis.getPose();
 
-	char text[64];
+	int lift_mm = distance_sensor.get();
 
-	snprintf(text, sizeof(text), "X: %.2f, Y: %.2f, Heading: %.2f", pose.x, pose.y, pose.theta);
+	char text[96];
+
+	if (lift_mm >= 9999 || lift_mm == PROS_ERR) {
+
+		snprintf(text, sizeof(text), "X: %.2f, Y: %.2f, Heading: %.2f, Lift: --", pose.x, pose.y, pose.theta);
+	}
+
+	else {
+
+		snprintf(text, sizeof(text), "X: %.2f, Y: %.2f, Heading: %.2f, Lift: %d mm", pose.x, pose.y, pose.theta, lift_mm);
+	}
 
 	pros::screen::set_pen(GRAY);
 
-	pros::screen::fill_rect(180, 224, 465, 239);
-
-	int text_width = std::strlen(text) * 7;
+	pros::screen::fill_rect(15, 204, 465, 220);
 
 	pros::screen::set_pen(WHITE);
 
-	pros::screen::print(pros::E_TEXT_SMALL, 460 - text_width, 229, "%s", text);
+	pros::screen::print(pros::E_TEXT_SMALL, 25, 209, "%s", text);
 }
 
 
