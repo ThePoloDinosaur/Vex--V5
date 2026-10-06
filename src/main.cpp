@@ -65,17 +65,11 @@ void move_lift_to(int target_mm, int timeout_ms) {
 
 		if (going_to_bottom) {
 
-			bool in_bottom_zone = current_mm <= LIFT_BOTTOM_MM + LIFT_TOLERANCE_MM;
-
-			bool stopped = std::abs(lift_motors.get_actual_velocity()) < 5;
-
-			if (in_bottom_zone && stopped && pros::millis() - start_time > 150) {
+			if (current_mm <= LIFT_BOTTOM_MM) {
 				break;
 			}
 
-			int speed = current_mm < LIFT_BOTTOM_MM + 30 ? 60 : 200;
-
-			lift_motors.move_velocity(speed);
+			lift_motors.move_velocity(200);
 		}
 
 		else {
@@ -779,7 +773,7 @@ pros::Task* selector_task = nullptr;
 
 
 void initialize() {
-	lift_motors.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+	lift_motors.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 
 	printf("1: initialize started\n");
 
@@ -926,9 +920,6 @@ void opcontrol() {
 	bool piston_last = false;
 
 
-	int lift_down_time = 0;
-
-
 	while (true) {
 
 
@@ -939,20 +930,10 @@ void opcontrol() {
 
 		if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
 
-			lift_down_time += 25;
-
 			int lift_mm = distance_sensor.get();
 
-			bool in_bottom_zone = lift_reading_valid(lift_mm) && lift_mm <= LIFT_BOTTOM_MM + LIFT_TOLERANCE_MM;
-
-			bool stopped = std::abs(lift_motors.get_actual_velocity()) < 5;
-
-			if (in_bottom_zone && stopped && lift_down_time > 150) {
+			if (lift_reading_valid(lift_mm) && lift_mm <= LIFT_BOTTOM_MM) {
 				lift_motors.move_velocity(0);
-			}
-
-			else if (lift_reading_valid(lift_mm) && lift_mm < LIFT_BOTTOM_MM + 30) {
-				lift_motors.move_velocity(60);
 			}
 
 			else {
@@ -962,17 +943,11 @@ void opcontrol() {
 
 
 		else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
-
-			lift_down_time = 0;
-
 			lift_motors.move_velocity(-200);
 		}
 
 
 		else {
-
-			lift_down_time = 0;
-
 			lift_motors.move_velocity(0);
 		}
 
