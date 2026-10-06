@@ -11,7 +11,8 @@ void driverwall_auton() {
 	pros::delay(50);
 	chassis.moveToPose(0,14,0, 800); // Go forward more to ensure the toggle is sprung
 	pros::delay(50);
-	chassis.turnToHeading(360,800); // Turn to face the wall so the toggle can be flipped
+	chassis.turnToHeading(180,800); // Turn to face the wall so the toggle can be flipped
+	chassis.turnToHeading(180,800); // Turn to face the wall so the toggle can be flipped
 	pros::delay(50);
 	chassis.moveToPose(0,-1,0,800, {.forwards = false}); // Go back to the wall and flip the toggle
 	pros::delay(50);
