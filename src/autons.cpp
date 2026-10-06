@@ -102,7 +102,7 @@ void skills_auton() {
 
 
 	chassis.setPose(0, 0, 0);
-	chassis.moveToPoint(0,24,3000);
+	move_lift_to(205, 1000);
 }
 
 
