@@ -82,13 +82,13 @@ void move_lift_to(int target_mm, int timeout_ms) {
 
 			int speed = std::abs(error) < 30 ? 60 : 200;
 
-			if (error > 0) {
+			if (error > 0) 
 				lift_motors.move_velocity(-speed);
 			}
 
 			else {
 				lift_motors.move_velocity(speed);
-			}
+			}	
 		}
 
 		pros::delay(20);
@@ -932,7 +932,9 @@ void opcontrol() {
 
 			int lift_mm = distance_sensor.get();
 
-			if (lift_reading_valid(lift_mm) && lift_mm <= LIFT_BOTTOM_MM) {
+			bool override_limit = controller.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT);
+
+			if (!override_limit && lift_reading_valid(lift_mm) && lift_mm <= LIFT_BOTTOM_MM) {
 				lift_motors.move_velocity(0);
 			}
 
