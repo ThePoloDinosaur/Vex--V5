@@ -8,7 +8,7 @@ extern pros::adi::Pneumatics piston;
 
 
 const int LIFT_BOTTOM_MM = 66;
-const int LIFT_TOLERANCE_MM = 3;
+const int LIFT_TOLERANCE_MM = 1;
 
 
 void move_lift_to(int target_mm, int timeout_ms);
