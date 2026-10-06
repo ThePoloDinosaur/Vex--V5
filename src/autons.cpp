@@ -8,18 +8,29 @@ void driverwall_auton() {
 
 	chassis.setPose(0, 0, 0);
 	chassis.moveToPose(0,8,0, 800); // Go forward to spring the toggle
+	pros::delay(50);
 	chassis.moveToPose(0,14,0, 800); // Go forward more to ensure the toggle is sprung
+	pros::delay(50);
 	chassis.turnToHeading(180,800); // Turn to face the wall so the toggle can be flipped
+	pros::delay(50);
 	chassis.moveToPoint(0,8, 800); // Spin to spring the toggle
+	pros::delay(50);
 	chassis.moveToPose(0,9,0, 800); // Go forward again to ensure the toggle is sprung fully
+	pros::delay(50);
 	chassis.moveToPose(0,-1,0,800, {.forwards = false}); // Go back to the wall and flip the toggle
+	pros::delay(50);
 	chassis.moveToPose(0,8,0,800); // Go forward so the toggle can be flipped again
+	pros::delay(50);
 	chassis.moveToPose(0,-1,0,800, {.forwards = false}); // Go back to the wall and flip the toggle again
+	pros::delay(50);
 	chassis.moveToPose(0,13.5,0,800); // Go to the alliance goal y
+	pros::delay(50);
 	chassis.turnToHeading(90,500); // Turn to face the alliance goal
+	pros::delay(50);
 	lift_motors.move_velocity(-30); // Lift the lift so the pin can be scored in the alliance goal
 	chassis.moveToPoint(10.5, 13.5, 800); // Move to the alliance goal x while the lift is lifting
 	lift_motors.move_velocity(0); // Stop the lift
+	pros::delay(50);
 	chassis.moveToPoint(20, 13.5, 500); // Move forward to ensure the robot is aligned with the alliance goal
 	pros::delay(500);
 	piston.set_value(false); // Release the pin into the alliance goal
@@ -57,18 +68,27 @@ void driverwall_auton() {
 
 void sidewall_auton() {
 
-	chassis.setPose(0, 0, 0);
+chassis.setPose(0, 0, 0);
 	chassis.moveToPose(0,8,0, 800); // Go forward to spring the toggle
+	pros::delay(50);
 	chassis.moveToPose(0,14,0, 800); // Go forward more to ensure the toggle is sprung
+	pros::delay(50);
 	chassis.turnToHeading(180,800); // Turn to face the wall so the toggle can be flipped
+	pros::delay(50);
 	chassis.moveToPoint(0,8, 800); // Spin to spring the toggle
+	pros::delay(50);
 	chassis.moveToPose(0,9,0, 800); // Go forward again to ensure the toggle is sprung fully
+	pros::delay(50);
 	chassis.moveToPose(0,-1,0,800, {.forwards = false}); // Go back to the wall and flip the toggle
+	pros::delay(50);
 	chassis.moveToPose(0,8,0,800); // Go forward so the toggle can be flipped again
+	pros::delay(50);
 	chassis.moveToPose(0,-1,0,800, {.forwards = false}); // Go back to the wall and flip the toggle again
+	pros::delay(50);
 	chassis.moveToPose(0,13.5,0,800); // Go to the alliance goal y
-	chassis.turnToHeading(-90,500); // Turn to face the alliance goal
+	pros::delay(50);
 	lift_motors.move_velocity(-30); // Lift the lift so the pin can be scored in the alliance goal
+		pros::delay(50);
 	chassis.moveToPoint(-10.5, 13.5, 800); // Move to the alliance goal x while the lift is lifting
 	lift_motors.move_velocity(0); // Stop the lift
 	chassis.moveToPoint(-20, 13.5, 500); // Move forward to ensure the robot is aligned with the alliance goal
