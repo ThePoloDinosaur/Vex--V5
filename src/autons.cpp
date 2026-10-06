@@ -3,6 +3,41 @@
 #include "pros/rtos.h"
 #include "autons.hpp"
 
+void drive_forward_hard(double inches, int timeout_ms) {
+
+	lemlib::Pose start = chassis.getPose();
+
+	int start_time = pros::millis();
+
+	left_motors.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+	right_motors.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+
+	while (pros::millis() - start_time < timeout_ms) {
+
+		lemlib::Pose now = chassis.getPose();
+
+		double traveled = std::hypot(now.x - start.x, now.y - start.y);
+
+		if (traveled >= inches) {
+			break;
+		}
+
+		left_motors.move(127);
+		right_motors.move(127);
+
+		pros::delay(10);
+	}
+
+	left_motors.brake();
+	right_motors.brake();
+
+	pros::delay(150);
+
+	left_motors.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+	right_motors.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+}
+
+
 
 void driverwall_auton() {
 

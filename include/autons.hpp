@@ -5,6 +5,11 @@
 extern lemlib::Chassis chassis;
 extern pros::MotorGroup lift_motors;
 extern pros::adi::Pneumatics piston;
+extern pros::MotorGroup left_motors;
+extern pros::MotorGroup right_motors;
+
+
+void drive_forward_hard(double inches, int timeout_ms);
 
 
 const int LIFT_BOTTOM_MM = 68;
