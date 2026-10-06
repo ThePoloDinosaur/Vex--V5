@@ -82,7 +82,7 @@ void move_lift_to(int target_mm, int timeout_ms) {
 
 			int speed = std::abs(error) < 30 ? 60 : 200;
 
-			if (error > 0) 
+			if (error > 0) {
 				lift_motors.move_velocity(-speed);
 			}
 
