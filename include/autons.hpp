@@ -7,7 +7,7 @@ extern pros::MotorGroup lift_motors;
 extern pros::adi::Pneumatics piston;
 
 
-const int LIFT_BOTTOM_MM = 65;
+const int LIFT_BOTTOM_MM = 66;
 const int LIFT_TOLERANCE_MM = 3;
 
 
