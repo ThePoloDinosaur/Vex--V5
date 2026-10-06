@@ -8,6 +8,9 @@ void driverwall_auton() {
 
 	chassis.setPose(0, 0, 0);
 	chassis.moveToPose(0,8,0, 800); // Go forward to spring the toggle
+	chassis.moveToPose(0,10,0, 800); // Go forward more to ensure the toggle is sprung
+	chassis.moveToPose(0,8,0, 800, {.forwards = false}); // Go backward to spring the toggle
+	chassis.moveToPose(0,9,0, 800); // Go forward again to ensure the toggle is sprung fully
 	chassis.moveToPose(0,-1,0,800, {.forwards = false}); // Go back to the wall and flip the toggle
 	chassis.moveToPose(0,8,0,800); // Go forward so the toggle can be flipped again
 	chassis.moveToPose(0,-1,0,800, {.forwards = false}); // Go back to the wall and flip the toggle again
