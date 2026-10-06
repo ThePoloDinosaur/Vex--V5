@@ -9,6 +9,7 @@ void driverwall_auton() {
 	chassis.setPose(0, 0, 0);
 	chassis.moveToPose(0,8,0, 800); // Go forward to spring the toggle
 	chassis.moveToPose(0,14,0, 800); // Go forward more to ensure the toggle is sprung
+	chassis.turnToHeading(180,800); // Turn to face the wall so the toggle can be flipped
 	chassis.moveToPoint(0,8, 800); // Spin to spring the toggle
 	chassis.moveToPose(0,9,0, 800); // Go forward again to ensure the toggle is sprung fully
 	chassis.moveToPose(0,-1,0,800, {.forwards = false}); // Go back to the wall and flip the toggle
@@ -39,8 +40,8 @@ void driverwall_auton() {
 	chassis.turnToHeading(90,1000); // Turn to face the alliance goal
 	pros::delay(300);
 	chassis.moveToPoint(-8,7,1000, {.maxSpeed = 200}); // Move to the alliance goal x while the lift is lifting
-	lift_motors.move_velocity(200); // Start lowering the lift so the cup-pin can be scored in the alliance goal
 	pros::delay(600);
+	lift_motors.move_velocity(200); // Start lowering the lift so the cup-pin can be scored in the alliance goal
 	chassis.moveToPoint(-4,7,1000, {.maxSpeed = 80}); // Move forward to ensure the robot is aligned with the alliance goal
 	pros::delay(200);
 	lift_motors.move_velocity(0); // Stop the lift
@@ -58,6 +59,10 @@ void sidewall_auton() {
 
 	chassis.setPose(0, 0, 0);
 	chassis.moveToPose(0,8,0, 800); // Go forward to spring the toggle
+	chassis.moveToPose(0,14,0, 800); // Go forward more to ensure the toggle is sprung
+	chassis.turnToHeading(180,800); // Turn to face the wall so the toggle can be flipped
+	chassis.moveToPoint(0,8, 800); // Spin to spring the toggle
+	chassis.moveToPose(0,9,0, 800); // Go forward again to ensure the toggle is sprung fully
 	chassis.moveToPose(0,-1,0,800, {.forwards = false}); // Go back to the wall and flip the toggle
 	chassis.moveToPose(0,8,0,800); // Go forward so the toggle can be flipped again
 	chassis.moveToPose(0,-1,0,800, {.forwards = false}); // Go back to the wall and flip the toggle again
@@ -86,8 +91,8 @@ void sidewall_auton() {
 	chassis.turnToHeading(-90,1000); // Turn to face the alliance goal
 	pros::delay(300);
 	chassis.moveToPoint(8,7,1000, {.maxSpeed = 200}); // Move to the alliance goal x while the lift is lifting
-	lift_motors.move_velocity(200); // Start lowering the lift so the cup-pin can be scored in the alliance goal
 	pros::delay(600);
+	lift_motors.move_velocity(200); // Start lowering the lift so the cup-pin can be scored in the alliance goal
 	chassis.moveToPoint(4,7,1000, {.maxSpeed = 80}); // Move forward to ensure the robot is aligned with the alliance goal
 	pros::delay(200);
 	lift_motors.move_velocity(0); // Stop the lift
