@@ -30,7 +30,7 @@ void driverwall_auton() {
 	pros::delay(500);
 	piston.set_value(true); // Grab the cup-pin
 	pros::delay(800);
-	lift_motors.move_velocity(-200); // Start lifting the cup-pin so it can be scored in the alliance goal
+	move_lift_to(205, 2000); // Start lifting the cup-pin so it can be scored in the alliance goal
 	chassis.moveToPoint(-24,7,1000); // Move to the alliance goal y while the lift is lifting
 	pros::delay(300);
 	chassis.turnToHeading(90,1000); // Turn to face the alliance goal
@@ -40,7 +40,7 @@ void driverwall_auton() {
 	pros::delay(600);
 	chassis.moveToPoint(-4,7,1000, {.maxSpeed = 80}); // Move forward to ensure the robot is aligned with the alliance goal
 	pros::delay(200);
-	lift_motors.move_velocity(0); // Stop the lift
+	move_lift_to(150, 2000); // Lower the lift
 	pros::delay(300);
 	piston.set_value(false); // Release the cup-pin onto the alliance goal
 	pros::delay(300);
@@ -77,17 +77,16 @@ void sidewall_auton() {
 	pros::delay(500);
 	piston.set_value(true); // Grab the cup-pin
 	pros::delay(800);
-	lift_motors.move_velocity(-200); // Start lifting the cup-pin so it can be scored in the alliance goal
+	move_lift_to(205, 2000); // Start lifting the cup-pin so it can be scored in the alliance goal
 	chassis.moveToPoint(24,7,1000); // Move to the alliance goal y while the lift is lifting
 	pros::delay(300);
 	chassis.turnToHeading(-90,1000); // Turn to face the alliance goal
 	pros::delay(300);
 	chassis.moveToPoint(8,7,1000, {.maxSpeed = 200}); // Move to the alliance goal x while the lift is lifting
-	lift_motors.move_velocity(200); // Start lowering the lift so the cup-pin can be scored in the alliance goal
 	pros::delay(600);
 	chassis.moveToPoint(4,7,1000, {.maxSpeed = 80}); // Move forward to ensure the robot is aligned with the alliance goal
 	pros::delay(200);
-	lift_motors.move_velocity(0); // Stop the lift
+	move_lift_to(150, 2000); // Lower the lift
 	pros::delay(300);
 	piston.set_value(false); // Release the cup-pin onto the alliance goal
 	pros::delay(300);
@@ -102,7 +101,7 @@ void skills_auton() {
 
 
 	chassis.setPose(0, 0, 0);
-	move_lift_to(205, 1000);
+	move_lift_to(205, 2000);
 }
 
 
@@ -110,7 +109,7 @@ void pid_lateral_auton() {
 
 
 	chassis.setPose(0, 0, 0);
-	chassis.moveToPoint(0,48,5000);
+	chassis.moveToPoint(0,48,3000);
 
 }
 
