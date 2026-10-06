@@ -11,11 +11,7 @@ void driverwall_auton() {
 	pros::delay(50);
 	chassis.moveToPose(0,14,0, 800); // Go forward more to ensure the toggle is sprung
 	pros::delay(50);
-	chassis.turnToHeading(180,800); // Turn to face the wall so the toggle can be flipped
-	pros::delay(50);
-	chassis.moveToPoint(0,8, 800); // Spin to spring the toggle
-	pros::delay(50);
-	chassis.moveToPose(0,9,0, 800); // Go forward again to ensure the toggle is sprung fully
+	chassis.turnToHeading(360,800); // Turn to face the wall so the toggle can be flipped
 	pros::delay(50);
 	chassis.moveToPose(0,-1,0,800, {.forwards = false}); // Go back to the wall and flip the toggle
 	pros::delay(50);
@@ -70,16 +66,12 @@ void driverwall_auton() {
 
 void sidewall_auton() {
 
-chassis.setPose(0, 0, 0);
+	chassis.setPose(0, 0, 0);
 	chassis.moveToPose(0,8,0, 800); // Go forward to spring the toggle
 	pros::delay(50);
 	chassis.moveToPose(0,14,0, 800); // Go forward more to ensure the toggle is sprung
 	pros::delay(50);
-	chassis.turnToHeading(180,800); // Turn to face the wall so the toggle can be flipped
-	pros::delay(50);
-	chassis.moveToPoint(0,8, 800); // Spin to spring the toggle
-	pros::delay(50);
-	chassis.moveToPose(0,9,0, 800); // Go forward again to ensure the toggle is sprung fully
+	chassis.turnToHeading(360,800); // Turn to face the wall so the toggle can be flipped
 	pros::delay(50);
 	chassis.moveToPose(0,-1,0,800, {.forwards = false}); // Go back to the wall and flip the toggle
 	pros::delay(50);
