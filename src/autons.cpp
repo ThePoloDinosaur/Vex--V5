@@ -3,11 +3,13 @@
 #include "pros/rtos.h"
 #include "autons.hpp"
 
-void drive_forward_hard(double inches, int timeout_ms) {
+void drive_forward_hard(double inches, int timeout_ms, bool forwards) {
 
 	lemlib::Pose start = chassis.getPose();
 
 	int start_time = pros::millis();
+
+	int power = forwards ? 127 : -127;
 
 	left_motors.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 	right_motors.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
@@ -22,8 +24,8 @@ void drive_forward_hard(double inches, int timeout_ms) {
 			break;
 		}
 
-		left_motors.move(127);
-		right_motors.move(127);
+		left_motors.move(power);
+		right_motors.move(power);
 
 		pros::delay(10);
 	}
