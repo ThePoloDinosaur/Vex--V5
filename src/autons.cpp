@@ -22,8 +22,9 @@ void driverwall_auton() {
 	chassis.moveToPose(0,8,0,800); // Go forward so the toggle can be flipped again
 	pros::delay(50);
 	chassis.moveToPose(0,-1,0,800, {.forwards = false}); // Go back to the wall and flip the toggle again
-	pros::delay(200);
+	pros::delay(1000);
 	chassis.setPose(0, 0, 0);
+	pros::delay(50);
 	chassis.moveToPose(0,13.5,0,800); // Go to the alliance goal y
 	pros::delay(50);
 	chassis.turnToHeading(90,500); // Turn to face the alliance goal
@@ -85,8 +86,9 @@ chassis.setPose(0, 0, 0);
 	chassis.moveToPose(0,8,0,800); // Go forward so the toggle can be flipped again
 	pros::delay(50);
 	chassis.moveToPose(0,-1,0,800, {.forwards = false}); // Go back to the wall and flip the toggle again
-	pros::delay(200);
+	pros::delay(1000);
 	chassis.setPose(0, 0, 0);
+	pros::delay(50);
 	chassis.moveToPose(0,13.5,0,800); // Go to the alliance goal y
 	pros::delay(50);
 	lift_motors.move_velocity(-30); // Lift the lift so the pin can be scored in the alliance goal
