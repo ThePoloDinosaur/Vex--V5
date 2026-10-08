@@ -271,7 +271,11 @@ enum Auton {
 	SIDEWALL,
 	SKILLS,
 	PID_LATERAL,
-	PID_ANGULAR
+	PID_ANGULAR,
+	ONLY_TOGGLE,
+	PLACEHOLDER_2,
+	PLACEHOLDER_3,
+	PLACEHOLDER_4
 };
 
 
@@ -279,7 +283,7 @@ enum Auton {
 Auton selected_auton = DRIVERWALL;
 
 
-bool on_pid_screen = false;
+bool on_more_screen = false;
 
 
 // ============================================================
@@ -338,13 +342,21 @@ const Button sidewall_button = {255, 65, 460, 150};
 
 const Button skills_button = {20, 158, 225, 198};
 
-const Button pid_tuning_button = {255, 158, 460, 198};
+const Button more_button = {255, 158, 460, 198};
 
 const Button back_button = {8, 8, 88, 42};
 
-const Button lateral_button = {20, 65, 225, 150};
+const Button lateral_button = {15, 58, 158, 124};
 
-const Button angular_button = {255, 65, 460, 150};
+const Button angular_button = {168, 58, 311, 124};
+
+const Button only_toggle_button = {321, 58, 464, 124};
+
+const Button placeholder_2_button = {15, 132, 158, 198};
+
+const Button placeholder_3_button = {168, 132, 311, 198};
+
+const Button placeholder_4_button = {321, 132, 464, 198};
 
 // ============================================================
 // DRAW BUTTON
@@ -419,10 +431,32 @@ const char* get_auton_name() {
 
 		case PID_ANGULAR:
 			return "PID ANGULAR";
+
+
+		case ONLY_TOGGLE:
+			return "ONLY TOGGLE";
+
+
+		case PLACEHOLDER_2:
+			return "PLACEHOLDER 2";
+
+
+		case PLACEHOLDER_3:
+			return "PLACEHOLDER 3";
+
+
+		case PLACEHOLDER_4:
+			return "PLACEHOLDER 4";
 	}
 
 
 	return "UNKNOWN";
+}
+
+
+bool more_auton_selected() {
+
+	return selected_auton != DRIVERWALL && selected_auton != SIDEWALL && selected_auton != SKILLS;
 }
 
 
@@ -536,9 +570,13 @@ void draw_auton_gui() {
 
 	draw_button_text(skills_button, "SKILLS");
 
-	draw_button(pid_tuning_button, selected_auton == PID_LATERAL || selected_auton == PID_ANGULAR ? LIGHT_GRAY : GRAY, LIGHT_GRAY);
+	// --------------------------------------------------------
+	// MORE BUTTON
+	// --------------------------------------------------------
 
-	draw_button_text(pid_tuning_button, "PID TUNING");
+	draw_button(more_button, more_auton_selected() ? LIGHT_GRAY : GRAY, LIGHT_GRAY);
+
+	draw_button_text(more_button, "MORE");
 
 	// --------------------------------------------------------
 	// SELECTED BAR
@@ -550,7 +588,15 @@ void draw_auton_gui() {
 }
 
 
-void draw_pid_gui() {
+void draw_more_button(const Button& button, Auton auton, const char* text) {
+
+	draw_button(button, selected_auton == auton ? LIGHT_GRAY : GRAY, LIGHT_GRAY);
+
+	draw_button_text(button, text);
+}
+
+
+void draw_more_gui() {
 
 	pros::screen::set_pen(BLACK);
 
@@ -562,7 +608,7 @@ void draw_pid_gui() {
 
 	pros::screen::set_pen(WHITE);
 
-	print_centered(pros::E_TEXT_LARGE, 20, 240, 8, "PID TUNING");
+	print_centered(pros::E_TEXT_LARGE, 20, 240, 8, "MORE");
 
 	draw_battery();
 
@@ -570,13 +616,17 @@ void draw_pid_gui() {
 
 	draw_button_text(back_button, "< BACK");
 
-	draw_button(lateral_button, selected_auton == PID_LATERAL ? LIGHT_GRAY : GRAY, LIGHT_GRAY);
+	draw_more_button(lateral_button, PID_LATERAL, "PID LATERAL");
 
-	draw_button_text(lateral_button, "LATERAL");
+	draw_more_button(angular_button, PID_ANGULAR, "PID ANGULAR");
 
-	draw_button(angular_button, selected_auton == PID_ANGULAR ? LIGHT_GRAY : GRAY, LIGHT_GRAY);
+	draw_more_button(only_toggle_button, ONLY_TOGGLE, "ONLY TOGGLE");
 
-	draw_button_text(angular_button, "ANGULAR");
+	draw_more_button(placeholder_2_button, PLACEHOLDER_2, "PLACEHOLDER 2");
+
+	draw_more_button(placeholder_3_button, PLACEHOLDER_3, "PLACEHOLDER 3");
+
+	draw_more_button(placeholder_4_button, PLACEHOLDER_4, "PLACEHOLDER 4");
 
 	draw_selected_bar();
 
@@ -637,13 +687,13 @@ void auton_selector_task() {
 			int y = touch.y;
 
 
-			if (on_pid_screen) {
+			if (on_more_screen) {
 
 
 				if (inside_button(back_button, x, y)) {
 
 
-					on_pid_screen = false;
+					on_more_screen = false;
 
 
 					draw_auton_gui();
@@ -656,7 +706,7 @@ void auton_selector_task() {
 					selected_auton = PID_LATERAL;
 
 
-					draw_pid_gui();
+					draw_more_gui();
 				}
 
 
@@ -666,7 +716,47 @@ void auton_selector_task() {
 					selected_auton = PID_ANGULAR;
 
 
-					draw_pid_gui();
+					draw_more_gui();
+				}
+
+
+				else if (inside_button(only_toggle_button, x, y)) {
+
+
+					selected_auton = ONLY_TOGGLE;
+
+
+					draw_more_gui();
+				}
+
+
+				else if (inside_button(placeholder_2_button, x, y)) {
+
+
+					selected_auton = PLACEHOLDER_2;
+
+
+					draw_more_gui();
+				}
+
+
+				else if (inside_button(placeholder_3_button, x, y)) {
+
+
+					selected_auton = PLACEHOLDER_3;
+
+
+					draw_more_gui();
+				}
+
+
+				else if (inside_button(placeholder_4_button, x, y)) {
+
+
+					selected_auton = PLACEHOLDER_4;
+
+
+					draw_more_gui();
 				}
 			}
 
@@ -719,13 +809,18 @@ void auton_selector_task() {
 				}
 
 
-				else if (inside_button(pid_tuning_button, x, y)) {
+				// ------------------------------------------------
+				// MORE
+				// ------------------------------------------------
 
 
-					on_pid_screen = true;
+				else if (inside_button(more_button, x, y)) {
 
 
-					draw_pid_gui();
+					on_more_screen = true;
+
+
+					draw_more_gui();
 				}
 			}
 		}
@@ -885,6 +980,11 @@ void autonomous() {
 			break;
 
 
+		// ====================================================
+		// MORE PAGE
+		// ====================================================
+
+
 		case PID_LATERAL:
 
 
@@ -898,6 +998,42 @@ void autonomous() {
 
 
 			pid_angular_auton();
+
+
+			break;
+
+
+		case ONLY_TOGGLE:
+
+
+			only_toggle_auton();
+
+
+			break;
+
+
+		case PLACEHOLDER_2:
+
+
+			placeholder_2_auton();
+
+
+			break;
+
+
+		case PLACEHOLDER_3:
+
+
+			placeholder_3_auton();
+
+
+			break;
+
+
+		case PLACEHOLDER_4:
+
+
+			placeholder_4_auton();
 
 
 			break;

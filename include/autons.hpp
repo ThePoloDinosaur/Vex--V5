@@ -24,3 +24,7 @@ void sidewall_auton();
 void skills_auton();
 void pid_lateral_auton();
 void pid_angular_auton();
+void only_toggle_auton();
+void placeholder_2_auton();
+void placeholder_3_auton();
+void placeholder_4_auton();

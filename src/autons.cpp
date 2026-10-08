@@ -2,6 +2,7 @@
 #include "main.h"
 #include "pros/rtos.h"
 #include "autons.hpp"
+#include <cmath>
 
 void drive_forward_hard(double inches, int timeout_ms, bool forwards) {
 
