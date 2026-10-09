@@ -191,3 +191,21 @@ void pid_angular_auton() {
     pros::delay(4500);
     chassis.turnToHeading(0,1000);
 }
+
+void only_toggle_auton() {
+	chassis.setPose(0, 0, 0);
+}
+
+void placeholder_2_auton() {
+	chassis.setPose(0, 0, 0);
+
+}
+
+void placeholder_3_auton() {
+	chassis.setPose(0, 0, 0);
+}
+
+
+void placeholder_4_auton() {
+	chassis.setPose(0, 0, 0);	
+}
