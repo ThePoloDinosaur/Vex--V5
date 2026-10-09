@@ -91,7 +91,7 @@ void driverwall_auton() {
 	lift_motors.move_velocity(200); // Start lowering the lift so the cup-pin can be scored in the alliance goal
 	pros::delay(300);
 	chassis.moveToPoint(-4,7,1000, {.maxSpeed = 80}); // Move forward to ensure the robot is aligned with the alliance goal
-	pros::delay(200);
+	pros::delay(500);
 	lift_motors.move_velocity(0); // Stop the lift
 	pros::delay(300);
 	piston.set_value(false); // Release the cup-pin onto the alliance goal
@@ -149,7 +149,7 @@ void sidewall_auton() {
 	lift_motors.move_velocity(200); // Start lowering the lift so the cup-pin can be scored in the alliance goal
 	pros::delay(300);
 	chassis.moveToPoint(4,7,1000, {.maxSpeed = 80}); // Move forward to ensure the robot is aligned with the alliance goal
-	pros::delay(200);
+	pros::delay(500);
 	lift_motors.move_velocity(0); // Stop the lift
 	pros::delay(300);
 	piston.set_value(false); // Release the cup-pin onto the alliance goal
