@@ -74,9 +74,9 @@ void driverwall_auton() {
 	chassis.setPose(0, 0, 0); // Reset the pose as the robot is in an aligned position
 	pros::delay(50);
 	chassis.moveToPose(0,-24,0,1000, {.forwards = false}); // Back up so that the robot can turn to face the first cup-pin
-	chassis.turnToPoint(-18,-1,1000); // Turn to face the first cup-pin
-	chassis.moveToPoint(-18,-1,2000); // Move to the first cup-pin
-	pros::delay(200);
+	chassis.turnToPoint(-18.5,-1,1000); // Turn to face the first cup-pin
+	chassis.moveToPoint(-18.5,-1,2000); // Move to the first cup-pin
+	pros::delay(600);
 	chassis.moveToPoint(-20,2.8,2000, {.maxSpeed = 3}); // Move slowly to the first cup-pin so that the robot doesn't knock it over
 	pros::delay(500);
 	piston.set_value(true); // Grab the cup-pin
