@@ -217,9 +217,8 @@ void skills_auton() {
 	pros::delay(300);
 	chassis.setPose(0, 0, 0); // Reset the pose as the robot is in an aligned position
 	pros::delay(300);
-	lift_motors.move_velocity(200); // Lower the lift so that the robot can back up and turn to face the next cup-pin
-	pros::delay(300);
 	chassis.moveToPoint(0,-22,1000, {.forwards = false}); // Back up so that the robot can turn to face the next cup-pin
+	pros::delay(300);
 	chassis.turnToHeading(-45,1000); // Turn to face the next cup-pin
 	pros::delay(300);
 	chassis.moveToPoint(-21,-1,1000); // Go to the next cup-pin
