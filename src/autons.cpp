@@ -194,6 +194,19 @@ void pid_angular_auton() {
 
 void only_toggle_auton() {
 	chassis.setPose(0, 0, 0);
+	drive_forward_hard(14, 1000);
+	pros::delay(50);
+	chassis.moveToPose(0,8,0, 800, {.forwards = false}); // Go forward more to ensure the toggle is sprung
+	pros::delay(50);
+	drive_forward_hard(5, 1000);
+	pros::delay(50);
+	chassis.moveToPose(0,-1,0,800, {.forwards = false}); // Go back to the wall and flip the toggle
+	pros::delay(50);
+	chassis.moveToPose(0,8,0,800); // Go forward so the toggle can be flipped again
+	pros::delay(50);
+	chassis.moveToPose(0,-1,0,800, {.forwards = false}); // Go back to the wall and flip the toggle again
+	pros::delay(50);
+	chassis.moveToPose(0,13.5,0,800); // Go to the alliance goal y
 }
 
 void placeholder_2_auton() {
