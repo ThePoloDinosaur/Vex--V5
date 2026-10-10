@@ -223,7 +223,7 @@ void skills_auton() {
 	pros::delay(300);
 	chassis.turnToHeading(-45,1000); // Turn to face the next cup-pin
 	pros::delay(300);
-	chassis.moveToPoint(-20,-2,1000); // Go to the next cup-pin
+	chassis.moveToPoint(-20,2,1000); // Go to the next cup-pin
 	pros::delay(300);
 	chassis.moveToPoint(-22,0,1000, {.maxSpeed = 3}); // Move slowly to the next cup-pin so that the robot doesn't knock it over
 	pros::delay(300);
