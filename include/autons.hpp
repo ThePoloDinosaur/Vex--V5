@@ -12,7 +12,7 @@ extern pros::MotorGroup right_motors;
 void drive_forward_hard(double inches, int timeout_ms, bool forwards = true);
 
 
-const int LIFT_BOTTOM_MM = 60;
+const int LIFT_BOTTOM_MM = 53;
 const int LIFT_TOLERANCE_MM = 1;
 
 

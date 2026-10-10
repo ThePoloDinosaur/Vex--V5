@@ -219,6 +219,8 @@ void skills_auton() {
 	pros::delay(300);
 	chassis.moveToPoint(0,-22,1000, {.forwards = false}); // Back up so that the robot can turn to face the next cup-pin
 	pros::delay(300);
+	move_lift_to(53,1000);
+	pros::delay(300);
 	chassis.turnToHeading(-45,1000); // Turn to face the next cup-pin
 	pros::delay(300);
 	chassis.moveToPoint(-21,-1,1000); // Go to the next cup-pin
