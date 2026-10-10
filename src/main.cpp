@@ -9,6 +9,7 @@
 #include "pros/screen.hpp"
 #include "autons.hpp"
 #include <cstring>
+#include <cmath>
 
 
 struct DebugPrint {
@@ -38,6 +39,63 @@ pros::MotorGroup right_motors({11, -12, -13}, pros::MotorGearset::blue);
 
 
 pros::MotorGroup lift_motors({-9, 14}, pros::MotorGearset::green);
+
+pros::Distance distance_sensor(6);
+
+
+bool lift_reading_valid(int lift_mm) {
+
+	return lift_mm != PROS_ERR && lift_mm < 9999;
+}
+
+
+void move_lift_to(int target_mm, int timeout_ms) {
+
+	bool going_to_bottom = target_mm <= LIFT_BOTTOM_MM;
+
+	int start_time = pros::millis();
+
+	while (pros::millis() - start_time < timeout_ms) {
+
+		int current_mm = distance_sensor.get();
+
+		if (!lift_reading_valid(current_mm)) {
+			break;
+		}
+
+		if (going_to_bottom) {
+
+			if (current_mm <= LIFT_BOTTOM_MM) {
+				break;
+			}
+
+			lift_motors.move_velocity(200);
+		}
+
+		else {
+
+			int error = target_mm - current_mm;
+
+			if (std::abs(error) <= LIFT_TOLERANCE_MM) {
+				break;
+			}
+
+			int speed = std::abs(error) < 30 ? 60 : 200;
+
+			if (error > 0) {
+				lift_motors.move_velocity(-speed);
+			}
+
+			else {
+				lift_motors.move_velocity(speed);
+			}	
+		}
+
+		pros::delay(20);
+	}
+
+	lift_motors.move_velocity(0);
+}
 
 
 // -------------------- PNEUMATIC -----------------------------
@@ -214,7 +272,11 @@ enum Auton {
 	SIDEWALL,
 	SKILLS,
 	PID_LATERAL,
-	PID_ANGULAR
+	PID_ANGULAR,
+	ONLY_TOGGLE,
+	PLACEHOLDER_2,
+	PLACEHOLDER_3,
+	PLACEHOLDER_4
 };
 
 
@@ -222,7 +284,7 @@ enum Auton {
 Auton selected_auton = DRIVERWALL;
 
 
-bool on_pid_screen = false;
+bool on_more_screen = false;
 
 
 // ============================================================
@@ -275,19 +337,27 @@ struct Button {
 // BUTTON LOCATIONS
 // ============================================================
 
-const Button driverwall_button = {20, 65, 225, 167};
+const Button driverwall_button = {20, 65, 225, 150};
 
-const Button sidewall_button = {255, 65, 460, 167};
+const Button sidewall_button = {255, 65, 460, 150};
 
-const Button skills_button = {20, 176, 225, 216};
+const Button skills_button = {20, 158, 225, 198};
 
-const Button pid_tuning_button = {255, 176, 460, 216};
+const Button more_button = {255, 158, 460, 198};
 
 const Button back_button = {8, 8, 88, 42};
 
-const Button lateral_button = {20, 65, 225, 167};
+const Button lateral_button = {15, 58, 158, 124};
 
-const Button angular_button = {255, 65, 460, 167};
+const Button angular_button = {168, 58, 311, 124};
+
+const Button only_toggle_button = {321, 58, 464, 124};
+
+const Button placeholder_2_button = {15, 132, 158, 198};
+
+const Button placeholder_3_button = {168, 132, 311, 198};
+
+const Button placeholder_4_button = {321, 132, 464, 198};
 
 // ============================================================
 // DRAW BUTTON
@@ -362,10 +432,32 @@ const char* get_auton_name() {
 
 		case PID_ANGULAR:
 			return "PID ANGULAR";
+
+
+		case ONLY_TOGGLE:
+			return "ONLY TOGGLE";
+
+
+		case PLACEHOLDER_2:
+			return "PLACEHOLDER 2";
+
+
+		case PLACEHOLDER_3:
+			return "PLACEHOLDER 3";
+
+
+		case PLACEHOLDER_4:
+			return "PLACEHOLDER 4";
 	}
 
 
 	return "UNKNOWN";
+}
+
+
+bool more_auton_selected() {
+
+	return selected_auton != DRIVERWALL && selected_auton != SIDEWALL && selected_auton != SKILLS;
 }
 
 
@@ -400,19 +492,27 @@ void draw_pose() {
 
 	lemlib::Pose pose = chassis.getPose();
 
-	char text[64];
+	int lift_mm = distance_sensor.get();
 
-	snprintf(text, sizeof(text), "X: %.2f, Y: %.2f, Heading: %.2f", pose.x, pose.y, pose.theta);
+	char text[96];
+
+	if (lift_mm >= 9999 || lift_mm == PROS_ERR) {
+
+		snprintf(text, sizeof(text), "X: %.2f, Y: %.2f, Heading: %.2f, Lift: --", pose.x, pose.y, pose.theta);
+	}
+
+	else {
+
+		snprintf(text, sizeof(text), "X: %.2f, Y: %.2f, Heading: %.2f, Lift: %d mm", pose.x, pose.y, pose.theta, lift_mm);
+	}
 
 	pros::screen::set_pen(GRAY);
 
-	pros::screen::fill_rect(180, 224, 465, 239);
-
-	int text_width = std::strlen(text) * 7;
+	pros::screen::fill_rect(15, 204, 465, 220);
 
 	pros::screen::set_pen(WHITE);
 
-	pros::screen::print(pros::E_TEXT_SMALL, 460 - text_width, 229, "%s", text);
+	pros::screen::print(pros::E_TEXT_SMALL, 25, 209, "%s", text);
 }
 
 
@@ -471,9 +571,13 @@ void draw_auton_gui() {
 
 	draw_button_text(skills_button, "SKILLS");
 
-	draw_button(pid_tuning_button, selected_auton == PID_LATERAL || selected_auton == PID_ANGULAR ? LIGHT_GRAY : GRAY, LIGHT_GRAY);
+	// --------------------------------------------------------
+	// MORE BUTTON
+	// --------------------------------------------------------
 
-	draw_button_text(pid_tuning_button, "PID TUNING");
+	draw_button(more_button, more_auton_selected() ? LIGHT_GRAY : GRAY, LIGHT_GRAY);
+
+	draw_button_text(more_button, "MORE");
 
 	// --------------------------------------------------------
 	// SELECTED BAR
@@ -485,7 +589,15 @@ void draw_auton_gui() {
 }
 
 
-void draw_pid_gui() {
+void draw_more_button(const Button& button, Auton auton, const char* text) {
+
+	draw_button(button, selected_auton == auton ? LIGHT_GRAY : GRAY, LIGHT_GRAY);
+
+	draw_button_text(button, text);
+}
+
+
+void draw_more_gui() {
 
 	pros::screen::set_pen(BLACK);
 
@@ -497,7 +609,7 @@ void draw_pid_gui() {
 
 	pros::screen::set_pen(WHITE);
 
-	print_centered(pros::E_TEXT_LARGE, 20, 240, 8, "PID TUNING");
+	print_centered(pros::E_TEXT_LARGE, 20, 240, 8, "MORE");
 
 	draw_battery();
 
@@ -505,13 +617,17 @@ void draw_pid_gui() {
 
 	draw_button_text(back_button, "< BACK");
 
-	draw_button(lateral_button, selected_auton == PID_LATERAL ? LIGHT_GRAY : GRAY, LIGHT_GRAY);
+	draw_more_button(lateral_button, PID_LATERAL, "PID LATERAL");
 
-	draw_button_text(lateral_button, "LATERAL");
+	draw_more_button(angular_button, PID_ANGULAR, "PID ANGULAR");
 
-	draw_button(angular_button, selected_auton == PID_ANGULAR ? LIGHT_GRAY : GRAY, LIGHT_GRAY);
+	draw_more_button(only_toggle_button, ONLY_TOGGLE, "ONLY TOGGLE");
 
-	draw_button_text(angular_button, "ANGULAR");
+	draw_more_button(placeholder_2_button, PLACEHOLDER_2, "PLACEHOLDER 2");
+
+	draw_more_button(placeholder_3_button, PLACEHOLDER_3, "PLACEHOLDER 3");
+
+	draw_more_button(placeholder_4_button, PLACEHOLDER_4, "PLACEHOLDER 4");
 
 	draw_selected_bar();
 
@@ -572,13 +688,13 @@ void auton_selector_task() {
 			int y = touch.y;
 
 
-			if (on_pid_screen) {
+			if (on_more_screen) {
 
 
 				if (inside_button(back_button, x, y)) {
 
 
-					on_pid_screen = false;
+					on_more_screen = false;
 
 
 					draw_auton_gui();
@@ -591,7 +707,7 @@ void auton_selector_task() {
 					selected_auton = PID_LATERAL;
 
 
-					draw_pid_gui();
+					draw_more_gui();
 				}
 
 
@@ -601,7 +717,47 @@ void auton_selector_task() {
 					selected_auton = PID_ANGULAR;
 
 
-					draw_pid_gui();
+					draw_more_gui();
+				}
+
+
+				else if (inside_button(only_toggle_button, x, y)) {
+
+
+					selected_auton = ONLY_TOGGLE;
+
+
+					draw_more_gui();
+				}
+
+
+				else if (inside_button(placeholder_2_button, x, y)) {
+
+
+					selected_auton = PLACEHOLDER_2;
+
+
+					draw_more_gui();
+				}
+
+
+				else if (inside_button(placeholder_3_button, x, y)) {
+
+
+					selected_auton = PLACEHOLDER_3;
+
+
+					draw_more_gui();
+				}
+
+
+				else if (inside_button(placeholder_4_button, x, y)) {
+
+
+					selected_auton = PLACEHOLDER_4;
+
+
+					draw_more_gui();
 				}
 			}
 
@@ -654,13 +810,18 @@ void auton_selector_task() {
 				}
 
 
-				else if (inside_button(pid_tuning_button, x, y)) {
+				// ------------------------------------------------
+				// MORE
+				// ------------------------------------------------
 
 
-					on_pid_screen = true;
+				else if (inside_button(more_button, x, y)) {
 
 
-					draw_pid_gui();
+					on_more_screen = true;
+
+
+					draw_more_gui();
 				}
 			}
 		}
@@ -708,7 +869,7 @@ pros::Task* selector_task = nullptr;
 
 
 void initialize() {
-	lift_motors.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+	lift_motors.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 
 	printf("1: initialize started\n");
 
@@ -820,6 +981,11 @@ void autonomous() {
 			break;
 
 
+		// ====================================================
+		// MORE PAGE
+		// ====================================================
+
+
 		case PID_LATERAL:
 
 
@@ -833,6 +999,42 @@ void autonomous() {
 
 
 			pid_angular_auton();
+
+
+			break;
+
+
+		case ONLY_TOGGLE:
+
+
+			only_toggle_auton();
+
+
+			break;
+
+
+		case PLACEHOLDER_2:
+
+
+			placeholder_2_auton();
+
+
+			break;
+
+
+		case PLACEHOLDER_3:
+
+
+			placeholder_3_auton();
+
+
+			break;
+
+
+		case PLACEHOLDER_4:
+
+
+			placeholder_4_auton();
 
 
 			break;
@@ -865,8 +1067,17 @@ void opcontrol() {
 
 		if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
 
+			int lift_mm = distance_sensor.get();
 
-			lift_motors.move_velocity(200);
+			bool override_limit = controller.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT);
+
+			if (!override_limit && lift_reading_valid(lift_mm) && lift_mm <= LIFT_BOTTOM_MM) {
+				lift_motors.move_velocity(0);
+			}
+
+			else {
+				lift_motors.move_velocity(200);
+			}
 		}
 
 
@@ -876,8 +1087,6 @@ void opcontrol() {
 
 
 		else {
-
-
 			lift_motors.move_velocity(0);
 		}
 

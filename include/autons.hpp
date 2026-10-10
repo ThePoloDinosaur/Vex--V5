@@ -1,12 +1,30 @@
 #pragma once
 #include "lemlib/api.hpp"
 
+
 extern lemlib::Chassis chassis;
 extern pros::MotorGroup lift_motors;
 extern pros::adi::Pneumatics piston;
+extern pros::MotorGroup left_motors;
+extern pros::MotorGroup right_motors;
+
+
+void drive_forward_hard(double inches, int timeout_ms, bool forwards = true);
+
+
+const int LIFT_BOTTOM_MM = 53;
+const int LIFT_TOLERANCE_MM = 1;
+
+
+void move_lift_to(int target_mm, int timeout_ms);
+
 
 void driverwall_auton();
 void sidewall_auton();
 void skills_auton();
 void pid_lateral_auton();
 void pid_angular_auton();
+void only_toggle_auton();
+void placeholder_2_auton();
+void placeholder_3_auton();
+void placeholder_4_auton();
