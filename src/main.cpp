@@ -52,11 +52,11 @@ pros::adi::Pneumatics piston('H', true);
 pros::Imu imu(16);
 
 
-// ----------------------Tracking-Wheels-----------------------
+// -------------------------Tracking---------------------------
 pros::Rotation vertical_sensor(-4);
 
 
-lemlib::TrackingWheel vertical_tracking_wheel(
+lemlib::TrackingWheel vertical_tracking_wheel( 
 	&vertical_sensor,
 	lemlib::Omniwheel::NEW_2,0
 );
@@ -135,7 +135,7 @@ lemlib::ControllerSettings angular_controller(
 // LEMLIB DRIVETRAIN
 // ============================================================
 //
-// YOUR ROBOT:
+// ROBOT:
 //
 // Drive motors:     4 blue motors, 2 half motors
 // Drive speed:      450 RPM
@@ -171,7 +171,8 @@ lemlib::Drivetrain drivetrain(
 // ODOMETRY SENSORS
 // ============================================================
 //
-// So every dedicated sensor is nullptr.
+// So every dedicated sensor is nullptr... EXCEPT FOR THE IMU, THE IMU WAS HELL
+// 
 //
 // LemLib will use the drivetrain motor encoders for its
 // position estimate.
