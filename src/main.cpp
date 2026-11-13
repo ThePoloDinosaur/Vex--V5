@@ -27,18 +27,29 @@ DebugPrint debug_a("A: program started");
 
 
 // -------------------- DRIVETRAIN ----------------------------
+//
+// 4 motor drivetrain (2 per side)
+// Left:  ports 11, 20
+// Right: ports 1, 10
+//
+// A negative port number reverses that motor. If a side drives
+// backwards, flip the signs on that side. If the two motors on
+// one side fight each other, flip the sign on just one of them.
+// ------------------------------------------------------------
 
 
-pros::MotorGroup left_motors({-1, 2, 3}, pros::MotorGearset::blue);
+pros::MotorGroup left_motors({-11, -20}, pros::MotorGearset::blue);
 
 
-pros::MotorGroup right_motors({11, -12, -13}, pros::MotorGearset::blue);
+pros::MotorGroup right_motors({1, -10}, pros::MotorGearset::blue);
 
 
 // -------------------- LIFT ----------------------------------
 
 
 pros::MotorGroup lift_motors({-9, 14}, pros::MotorGearset::green);
+
+pros::Motor intake_motor({12});
 
 pros::Distance distance_sensor(6);
 
@@ -195,12 +206,12 @@ lemlib::ControllerSettings angular_controller(
 //
 // ROBOT:
 //
-// Drive motors:     4 blue motors, 2 half motors
+// Drive motors:     4 blue motors (2 left, 2 right)
 // Drive speed:      450 RPM
 // Drive wheels:     2.75" omni wheels
 // Track width:      31.7 cm = 12.48 inches
-// Tracking wheels:  NONE
-// IMU:              NONE
+// Tracking wheels:  1 vertical
+// IMU:              port 16
 //
 // LemLib recommends a horizontal drift of 2 when using omni
 // wheels rather than traction wheels.
@@ -926,12 +937,6 @@ void autonomous() {
 
 
 	// --------------------------------------------------------
-	// GUI
-	// --------------------------------------------------------
-
-
-
-	// --------------------------------------------------------
 	// SELECTED AUTON
 	// --------------------------------------------------------
 
@@ -939,104 +944,48 @@ void autonomous() {
 	switch (selected_auton) {
 
 
-		// ====================================================
-		// DRIVER WALL
-		// ====================================================
-
-
 		case DRIVERWALL:
-
-
 			driverwall_auton();
-
-
 			break;
-
-
-		// ====================================================
-		// SIDE WALL
-		// ====================================================
 
 
 		case SIDEWALL:
-
-
 			sidewall_auton();
-
-
 			break;
-
-
-		// ====================================================
-		// SKILLS
-		// ====================================================
 
 
 		case SKILLS:
-
-
 			skills_auton();
-
-
 			break;
 
 
-		// ====================================================
-		// MORE PAGE
-		// ====================================================
-
-
 		case PID_LATERAL:
-
-
 			pid_lateral_auton();
-
-
 			break;
 
 
 		case PID_ANGULAR:
-
-
 			pid_angular_auton();
-
-
 			break;
 
 
 		case ONLY_TOGGLE:
-
-
 			only_toggle_auton();
-
-
 			break;
 
 
 		case PLACEHOLDER_2:
-
-
 			placeholder_2_auton();
-
-
 			break;
 
 
 		case PLACEHOLDER_3:
-
-
 			placeholder_3_auton();
-
-
 			break;
 
 
 		case PLACEHOLDER_4:
-
-
 			placeholder_4_auton();
-
-
 			break;
 	}
 
@@ -1124,6 +1073,20 @@ void opcontrol() {
 		piston_last = piston_pressed;
 
 
+
+		if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
+
+			intake_motor.move_velocity(200);
+
+		}
+
+		else {
+			intake_motor.move_velocity(0);
+		}
+
+		if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_R2)) {
+			intake_motor.move_velocity(-200);
+		}
 		// ====================================================
 		// LOOP DELAY
 		// ====================================================
